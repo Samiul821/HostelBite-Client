@@ -25,8 +25,8 @@ const Navbar = ({ user, onLogout }) => {
       <div className="flex items-center space-x-3 cursor-pointer select-none font-extrabold text-xl">
         <NavLink to="/" className={colors.primary}>
           Hostel
+          <span className="text-orange-500">Bite</span>
         </NavLink>
-        <span className="text-orange-500">Bite</span>
       </div>
 
       {/* Desktop Menu */}
@@ -70,7 +70,7 @@ const Navbar = ({ user, onLogout }) => {
         {/* Join Us or Profile */}
         {!user ? (
           <NavLink
-            to="/join"
+            to="/login"
             className="btn btn-primary px-4 py-2 rounded font-medium"
             onClick={() => setMenuOpen(false)}
           >
