@@ -5,12 +5,18 @@ import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTheme } from "../../../Hooks/useTheme";
+import useAuth from "../../../Hooks/useAuth";
+import toast from "react-hot-toast";
+import useAxios from "../../../Hooks/useAxios";
 
 const Login = () => {
   const { isDark } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
+  const { signIn, googleSignIn, facebookSignIn, passwordReset } = useAuth();
+  const axiosInstance = useAxios();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -19,19 +25,88 @@ const Login = () => {
   } = useForm();
 
   const handleSignIn = (data) => {
-    console.log(data); // You can integrate login logic here
+    console.log(data);
+    signIn(data.email, data.password)
+      .then((result) => {
+        const user = result.user;
+        toast.success("User logged in successfully!");
+        navigate("/");
+
+        console.log(user);
+      })
+      .catch((error) => {
+        toast.error("Failed to log in. Please check your credentials.");
+        console.log("Error logging in:", error);
+      });
   };
 
   const handleGoogleSignIn = () => {
-    console.log("Google Sign-In");
+    googleSignIn()
+      .then(async (reslut) => {
+        const user = reslut.user;
+        navigate("/");
+
+        console.log("Google Sign In User:", user);
+        const userInfo = {
+          name: user.name,
+          email: user.email,
+          role: "user",
+          badge: "Bronze",
+          createdAt: new Date().toISOString(),
+          lastLogin: new Date().toISOString(),
+        };
+
+        const res = await axiosInstance.post("/users", userInfo);
+        console.log("user update info", res.data);
+
+        toast.success("Logged in successfully with Google!");
+      })
+      .catch((error) => {
+        console.error("Google Sign In Error:", error);
+        toast.error("Failed to log in with Google. Please try again.");
+      });
   };
 
   const handleFacebookSignIn = () => {
-    console.log("Facebook Sign-In");
+    facebookSignIn()
+      .then(async (result) => {
+        const user = result.user;
+        navigate("/");
+
+        console.log("Facebook Sign In User:", user);
+        const userInfo = {
+          name: user.displayName || "Unnamed",
+          email: user.email,
+          role: "user",
+          badge: "Bronze",
+          createdAt: new Date().toISOString(),
+          lastLogin: new Date().toISOString(),
+        };
+
+        const res = await axiosInstance.post("/users", userInfo);
+        console.log("user update info", res.data);
+
+        toast.success("Logged in successfully with Facebook!");
+      })
+      .catch((error) => {
+        console.error("Facebook Sign In Error:", error);
+        toast.error("Failed to log in with Facebook. Please try again.");
+      });
   };
 
   const handlePasswordReset = () => {
-    console.log("Reset Password Triggered");
+    const email = prompt("Please enter your email address:");
+    if (email) {
+      passwordReset(email)
+        .then(() => {
+          toast.success("Password reset email sent");
+        })
+        .catch(() => {
+          toast.error("Error sending password reset email");
+        });
+    } else {
+      toast.error("Email address is required");
+    }
   };
 
   return (

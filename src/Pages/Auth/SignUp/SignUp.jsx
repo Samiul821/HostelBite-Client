@@ -5,7 +5,7 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
 import { useTheme } from "../../../Hooks/useTheme";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import useAxios from "../../../Hooks/useAxios";
 import useAuth from "../../../Hooks/useAuth";
@@ -16,7 +16,9 @@ const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [uploading, setUploading] = useState(false);
   const axiosInstance = useAxios();
-  const { createUser, updateUser, setUser } = useAuth();
+  const navigate = useNavigate();
+  const { createUser, updateUser, googleSignIn, facebookSignIn, setUser } =
+    useAuth();
 
   const {
     register,
@@ -95,13 +97,57 @@ const SignUp = () => {
   };
 
   const handleGoogleSignIn = () => {
-    toast("Google Sign-In clicked");
-    // Add your Google sign-in logic here
+    googleSignIn()
+      .then(async (reslut) => {
+        const user = reslut.user;
+        navigate("/");
+
+        console.log("Google Sign In User:", user);
+        const userInfo = {
+          name: user.name,
+          email: user.email,
+          role: "user",
+          badge: "Bronze",
+          createdAt: new Date().toISOString(),
+          lastLogin: new Date().toISOString(),
+        };
+
+        const res = await axiosInstance.post("/users", userInfo);
+        console.log("user update info", res.data);
+
+        toast.success("Logged in successfully with Google!");
+      })
+      .catch((error) => {
+        console.error("Google Sign In Error:", error);
+        toast.error("Failed to log in with Google. Please try again.");
+      });
   };
 
   const handleFacebookSignIn = () => {
-    toast("Facebook Sign-In clicked");
-    // Add your Facebook sign-in logic here
+    facebookSignIn()
+      .then(async (result) => {
+        const user = result.user;
+        navigate("/");
+
+        console.log("Facebook Sign In User:", user);
+        const userInfo = {
+          name: user.displayName || "Unnamed",
+          email: user.email,
+          role: "user",
+          badge: "Bronze",
+          createdAt: new Date().toISOString(),
+          lastLogin: new Date().toISOString(),
+        };
+
+        const res = await axiosInstance.post("/users", userInfo);
+        console.log("user update info", res.data);
+
+        toast.success("Logged in successfully with Facebook!");
+      })
+      .catch((error) => {
+        console.error("Facebook Sign In Error:", error);
+        toast.error("Failed to log in with Facebook. Please try again.");
+      });
   };
 
   return (

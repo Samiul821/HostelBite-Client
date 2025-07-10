@@ -1,14 +1,16 @@
 import { useState, useEffect, useRef } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FaBell, FaBars, FaTimes, FaMoon, FaSun } from "react-icons/fa";
 import { useTheme } from "../../../Hooks/useTheme";
 import useAuth from "../../../Hooks/useAuth";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const { isDark, toggleTheme, colors } = useTheme();
-  const { user } = useAuth();
+  const { user, logOut } = useAuth();
+  const navigate = useNavigate();
 
   const dropdownRef = useRef(null);
 
@@ -25,8 +27,14 @@ const Navbar = () => {
 
   // Logout function placeholder
   const onLogout = () => {
-    // এখানে তোমার লগআউট লজিক লিখবে
-    alert("Logged out!");
+    logOut()
+      .then(() => {
+        toast.success("Logged out successfully!");
+        navigate("/");
+      })
+      .catch(() => {
+        toast.error("Logout failed. Please try again.");
+      });
   };
 
   const navItems = [
