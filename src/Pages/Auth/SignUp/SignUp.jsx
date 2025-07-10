@@ -5,7 +5,7 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
 import { useTheme } from "../../../Hooks/useTheme";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import useAxios from "../../../Hooks/useAxios";
 import useAuth from "../../../Hooks/useAuth";
@@ -19,6 +19,7 @@ const SignUp = () => {
   const navigate = useNavigate();
   const { createUser, updateUser, googleSignIn, facebookSignIn, setUser } =
     useAuth();
+  const location = useLocation();
 
   const {
     register,
@@ -100,7 +101,8 @@ const SignUp = () => {
     googleSignIn()
       .then(async (reslut) => {
         const user = reslut.user;
-        navigate("/");
+        const from = location.state?.from?.pathname || "/";
+        navigate(from, { replace: true });
 
         console.log("Google Sign In User:", user);
         const userInfo = {
@@ -128,7 +130,8 @@ const SignUp = () => {
     facebookSignIn()
       .then(async (result) => {
         const user = result.user;
-        navigate("/");
+        const from = location.state?.from?.pathname || "/";
+        navigate(from, { replace: true });
 
         console.log("Facebook Sign In User:", user);
         const userInfo = {

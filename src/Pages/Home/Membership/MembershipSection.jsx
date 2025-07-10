@@ -31,7 +31,7 @@ const MembershipSection = () => {
 
   return (
     <section>
-      <div className="max-w-7xl mx-auto text-center px-4 py-12">
+      <div className="max-w-7xl mx-auto text-center">
         <h2
           className={`text-3xl md:text-4xl font-bold mb-4 ${
             isDark ? "text-indigo-400" : ""

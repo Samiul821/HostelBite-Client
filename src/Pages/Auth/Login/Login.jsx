@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "../../../Hooks/useTheme";
 import useAuth from "../../../Hooks/useAuth";
 import toast from "react-hot-toast";
@@ -17,6 +17,7 @@ const Login = () => {
   const { signIn, googleSignIn, facebookSignIn, passwordReset } = useAuth();
   const axiosInstance = useAxios();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const {
     register,
@@ -30,7 +31,8 @@ const Login = () => {
       .then((result) => {
         const user = result.user;
         toast.success("User logged in successfully!");
-        navigate("/");
+        const from = location.state?.from?.pathname || "/";
+        navigate(from, { replace: true });
 
         console.log(user);
       })
@@ -44,7 +46,8 @@ const Login = () => {
     googleSignIn()
       .then(async (reslut) => {
         const user = reslut.user;
-        navigate("/");
+        const from = location.state?.from?.pathname || "/";
+        navigate(from, { replace: true });
 
         console.log("Google Sign In User:", user);
         const userInfo = {
@@ -72,7 +75,8 @@ const Login = () => {
     facebookSignIn()
       .then(async (result) => {
         const user = result.user;
-        navigate("/");
+        const from = location.state?.from?.pathname || "/";
+        navigate(from, { replace: true });
 
         console.log("Facebook Sign In User:", user);
         const userInfo = {
