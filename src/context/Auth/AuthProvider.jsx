@@ -23,7 +23,7 @@ const AuthProvider = ({ children }) => {
     return createUserWithEmailAndPassword(auth, email, password);
   };
 
-  const updatedUser = (userData) => {
+  const updateUser = (userData) => {
     return updateProfile(auth.currentUser, userData);
   };
 
@@ -64,7 +64,7 @@ const AuthProvider = ({ children }) => {
     setUser,
     loading,
     createUser,
-    updatedUser,
+    updateUser,
     signIn,
     googleSignIn,
     facebookSignIn,

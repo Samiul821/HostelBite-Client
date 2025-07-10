@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
+import { FaFacebook } from "react-icons/fa";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import { useTheme } from "../../../Hooks/useTheme";
@@ -23,6 +24,10 @@ const Login = () => {
 
   const handleGoogleSignIn = () => {
     console.log("Google Sign-In");
+  };
+
+  const handleFacebookSignIn = () => {
+    console.log("Facebook Sign-In");
   };
 
   const handlePasswordReset = () => {
@@ -154,7 +159,7 @@ const Login = () => {
           </form>
 
           {/* Google Sign In */}
-          <div className="mt-6">
+          <div className="mt-6 flex flex-col gap-4">
             <motion.button
               onClick={handleGoogleSignIn}
               whileHover={{ scale: 1.05 }}
@@ -168,6 +173,22 @@ const Login = () => {
             >
               <FcGoogle size={22} />
               Sign in with Google
+            </motion.button>
+
+            {/* Facebook Sign In */}
+            <motion.button
+              onClick={handleFacebookSignIn}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 15 }}
+              className={`w-full flex items-center justify-center gap-3 font-semibold py-3 rounded-xl shadow-sm transition text-blue-700 border border-gray-300 hover:bg-gray-100 focus:outline-none focus:ring-4 ${
+                isDark
+                  ? "bg-gray-700 hover:bg-gray-600 focus:ring-indigo-500"
+                  : "bg-white"
+              }`}
+            >
+              <FaFacebook size={22} />
+              Sign in with Facebook
             </motion.button>
           </div>
 

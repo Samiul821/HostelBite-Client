@@ -1,5 +1,4 @@
 import { useState } from "react";
-
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
@@ -7,10 +6,17 @@ import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
 import { useTheme } from "../../../Hooks/useTheme";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import useAxios from "../../../Hooks/useAxios";
+import useAuth from "../../../Hooks/useAuth";
+import toast from "react-hot-toast";
 
 const SignUp = () => {
   const { isDark } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const axiosInstance = useAxios();
+  const { createUser, updateUser, setUser } = useAuth();
 
   const {
     register,
@@ -18,23 +24,84 @@ const SignUp = () => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    const imageFile = data.image[0]; // file object
-    console.log("Form data:", {
-      name: data.name,
-      email: data.email,
-      password: data.password,
-      image: imageFile,
-    });
-    // Signup logic here
+  const handleImageUpload = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "my_unsigned");
+
+    try {
+      const res = await axios.post(
+        "https://api.cloudinary.com/v1_1/dpsrlv5bf/image/upload",
+        formData
+      );
+      return res.data.secure_url;
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      return null;
+    }
+  };
+
+  const onSubmit = async (data) => {
+    if (data.image && data.image.length > 0) {
+      setUploading(true);
+
+      try {
+        const uploadedImageUrl = await handleImageUpload(data.image[0]);
+        if (!uploadedImageUrl) {
+          toast.error("Failed to upload image. Please try again.");
+          setUploading(false);
+          return;
+        }
+
+        // Create user with email & password
+        const createdUser = await createUser(data.email, data.password);
+
+        // Update Firebase user profile
+        await updateUser({
+          displayName: data.name,
+          photoURL: uploadedImageUrl,
+        });
+
+        // Prepare user info for backend
+        const userInfo = {
+          name: data.name,
+          email: data.email,
+          role: "user",
+          badge: "Bronze",
+          profileImage: uploadedImageUrl,
+          createdAt: new Date().toISOString(),
+          lastLogin: new Date().toISOString(),
+        };
+
+        // Save user info to backend DB
+        await axiosInstance.post("/users", userInfo);
+
+        setUser(createdUser.user);
+
+        toast.success("User created successfully!");
+      } catch (error) {
+        console.error("Signup error:", error);
+        if (error.code === "auth/email-already-in-use") {
+          toast.error("This email is already registered.");
+        } else {
+          toast.error("Signup failed. Please try again.");
+        }
+      } finally {
+        setUploading(false);
+      }
+    } else {
+      toast.error("Please upload a profile image.");
+    }
   };
 
   const handleGoogleSignIn = () => {
-    console.log("Google Sign-In clicked");
+    toast("Google Sign-In clicked");
+    // Add your Google sign-in logic here
   };
 
   const handleFacebookSignIn = () => {
-    console.log("Facebook Sign-In clicked");
+    toast("Facebook Sign-In clicked");
+    // Add your Facebook sign-in logic here
   };
 
   return (
@@ -171,12 +238,13 @@ const SignUp = () => {
           {/* Submit */}
           <motion.button
             type="submit"
+            disabled={uploading}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 400, damping: 15 }}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl shadow-md focus:outline-none focus:ring-4 focus:ring-indigo-300"
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl shadow-md focus:outline-none focus:ring-4 focus:ring-indigo-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Sign Up
+            {uploading ? "Uploading..." : "Sign Up"}
           </motion.button>
         </form>
 
