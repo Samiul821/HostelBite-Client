@@ -1,3 +1,5 @@
+// File: components/shared/Navbar.jsx
+
 import { useState, useEffect, useRef } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FaBell, FaBars, FaTimes, FaMoon, FaSun } from "react-icons/fa";
@@ -11,31 +13,7 @@ const Navbar = () => {
   const { isDark, toggleTheme, colors } = useTheme();
   const { user, logOut } = useAuth();
   const navigate = useNavigate();
-
   const dropdownRef = useRef(null);
-
-  // Click outside dropdown to close it
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  // Logout function placeholder
-  const onLogout = () => {
-    logOut()
-      .then(() => {
-        toast.success("Logged out successfully!");
-        navigate("/");
-      })
-      .catch(() => {
-        toast.error("Logout failed. Please try again.");
-      });
-  };
 
   const navItems = [
     { to: "/", label: "Home" },
@@ -43,28 +21,45 @@ const Navbar = () => {
     { to: "/upcoming", label: "Upcoming Meals" },
   ];
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const onLogout = () => {
+    logOut()
+      .then(() => {
+        toast.success("Logged out successfully!");
+        navigate("/");
+      })
+      .catch(() => toast.error("Logout failed!"));
+  };
+
   const activeClass = "text-indigo-600 font-bold border-b-4 border-indigo-600";
 
   return (
     <nav
-      className={`${colors.background} ${colors.text} px-[3%] lg:px-[10%] py-4 flex items-center justify-between shadow-md sticky top-0 z-30`}
+      className={`sticky top-0 z-30 shadow-md px-[3%] lg:px-[10%] py-4 flex items-center justify-between ${colors.background} ${colors.text}`}
     >
       {/* Logo */}
-      <div className="flex items-center space-x-4 cursor-pointer select-none font-extrabold text-2xl">
-        <NavLink to="/" className={colors.primary}>
-          Hostel<span className="text-orange-500">Bite</span>
-        </NavLink>
-      </div>
+      <NavLink to="/" className="text-2xl font-extrabold">
+        Hostel<span className="text-orange-500">Bite</span>
+      </NavLink>
 
-      {/* Desktop Menu */}
-      <ul className="hidden md:flex space-x-10 items-center font-semibold text-lg">
+      {/* Desktop Nav */}
+      <ul className="hidden md:flex space-x-10 text-lg font-semibold">
         {navItems.map(({ to, label }) => (
           <li key={to}>
             <NavLink
               to={to}
               className={({ isActive }) =>
-                `hover:text-indigo-600 transition-colors duration-300 ${
-                  isActive ? activeClass : "text-inherit"
+                `hover:text-indigo-600 transition-colors duration-200 ${
+                  isActive ? activeClass : ""
                 }`
               }
             >
@@ -74,33 +69,25 @@ const Navbar = () => {
         ))}
       </ul>
 
-      {/* Right Side */}
-      <div className="flex items-center space-x-5">
-        {/* Notification */}
-        <button
-          aria-label="Notifications"
-          className="relative hover:text-orange-500 transition text-xl"
-        >
-          <FaBell size={22} />
+      {/* Right Panel */}
+      <div className="flex items-center gap-4">
+        {/* Notification Icon */}
+        <div className="relative text-xl hover:text-orange-500 transition">
+          <FaBell />
           <span className="absolute top-0 right-0 w-3 h-3 bg-red-600 rounded-full animate-ping" />
           <span className="absolute top-0 right-0 w-3 h-3 bg-red-600 rounded-full" />
+        </div>
+
+        {/* Theme Switch */}
+        <button onClick={toggleTheme} className="text-xl">
+          {isDark ? <FaSun /> : <FaMoon />}
         </button>
 
-        {/* Theme Toggle */}
-        <button
-          onClick={toggleTheme}
-          className="hover:text-orange-500 transition text-xl"
-          aria-label="Toggle Theme"
-        >
-          {!isDark ? <FaMoon size={20} /> : <FaSun size={20} />}
-        </button>
-
-        {/* Join Us or Profile */}
+        {/* Auth Buttons */}
         {!user ? (
           <NavLink
             to="/login"
-            className="btn btn-primary px-6 py-2 rounded font-semibold text-lg"
-            onClick={() => setMenuOpen(false)}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-md font-semibold"
           >
             Join Us
           </NavLink>
@@ -108,39 +95,32 @@ const Navbar = () => {
           <div className="relative" ref={dropdownRef}>
             <img
               src={user.photoURL || "https://i.pravatar.cc/40"}
-              alt="Profile"
               className="w-10 h-10 rounded-full cursor-pointer border-2 border-indigo-600"
+              alt="User"
               onClick={() => setDropdownOpen(!dropdownOpen)}
             />
-
-            {/* Dropdown */}
             {dropdownOpen && (
               <div
-                className={`absolute right-0 mt-3 w-56 rounded-lg shadow-xl z-50 overflow-hidden ${
-                  isDark
-                    ? "bg-gray-900 text-gray-200"
-                    : "bg-white text-gray-900"
+                className={`absolute right-0 mt-2 w-56 rounded-md shadow-xl overflow-hidden z-50 ${
+                  isDark ? "bg-gray-800 text-white" : "bg-white text-gray-900"
                 }`}
                 style={{ animation: "fadeInDropdown 0.25s ease-in-out" }}
               >
-                <div className="px-6 py-4 border-b border-gray-700 font-semibold select-none">
+                <div className="px-6 py-4 border-b border-gray-300 font-semibold">
                   {user.displayName || "User"}
                 </div>
                 <button
-                  className={`w-full text-left px-6 py-3 hover:bg-indigo-600 hover:text-white transition-colors duration-200`}
+                  className="block w-full text-left px-6 py-3 hover:bg-indigo-600 hover:text-white"
                   onClick={() => {
                     setDropdownOpen(false);
-                    window.location.href = "/dashboard";
+                    navigate("/dashboard");
                   }}
                 >
                   Dashboard
                 </button>
                 <button
-                  className={`w-full text-left px-6 py-3 hover:bg-indigo-600 hover:text-white transition-colors duration-200`}
-                  onClick={() => {
-                    setDropdownOpen(false);
-                    onLogout();
-                  }}
+                  className="block w-full text-left px-6 py-3 hover:bg-indigo-600 hover:text-white"
+                  onClick={onLogout}
                 >
                   Logout
                 </button>
@@ -149,13 +129,12 @@ const Navbar = () => {
           </div>
         )}
 
-        {/* Mobile Menu Toggle */}
+        {/* Mobile Menu Icon */}
         <button
-          className="md:hidden ml-3 text-2xl"
+          className="md:hidden text-2xl"
           onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle Menu"
         >
-          {menuOpen ? <FaTimes size={26} /> : <FaBars size={26} />}
+          {menuOpen ? <FaTimes /> : <FaBars />}
         </button>
       </div>
 
@@ -164,58 +143,53 @@ const Navbar = () => {
         <>
           <div
             onClick={() => setMenuOpen(false)}
-            className="fixed inset-0 bg-black bg-opacity-30 z-40"
-          />
+            className="fixed inset-0 bg-black bg-opacity-40 z-40"
+          ></div>
           <ul
-            className={`${colors.background} ${colors.text} fixed top-0 left-0 w-64 h-full flex flex-col space-y-6 p-6 z-50 font-semibold shadow-lg transform transition-transform duration-300 ease-in-out`}
+            className={`fixed top-0 left-0 w-64 h-full bg-white dark:bg-gray-900 text-black dark:text-white z-50 shadow-lg p-6 space-y-6 font-semibold`}
           >
             {navItems.map(({ to, label }) => (
               <li key={to}>
                 <NavLink
                   to={to}
+                  onClick={() => setMenuOpen(false)}
                   className={({ isActive }) =>
-                    `block py-3 px-4 rounded transition-colors duration-300 ${
-                      isActive
-                        ? "text-indigo-600 bg-indigo-100 dark:bg-indigo-900"
-                        : "hover:bg-gray-200 dark:hover:bg-gray-700"
+                    `block px-4 py-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 ${
+                      isActive ? activeClass : ""
                     }`
                   }
-                  onClick={() => setMenuOpen(false)}
                 >
                   {label}
                 </NavLink>
               </li>
             ))}
-
-            <li className="mt-auto">
+            <li className="mt-6 border-t pt-4">
               {!user ? (
                 <NavLink
-                  to="/join"
-                  className="btn btn-primary block w-full text-center px-4 py-3 rounded font-semibold"
+                  to="/login"
+                  className="bg-indigo-600 text-white px-4 py-2 rounded block text-center"
                   onClick={() => setMenuOpen(false)}
                 >
                   Join Us
                 </NavLink>
               ) : (
                 <>
-                  <div className="border-t pt-4 px-4 font-semibold select-none">
-                    {user.displayName || "User"}
-                  </div>
+                  <p className="px-4 pt-2 pb-1">{user.displayName}</p>
                   <button
-                    className="w-full text-left px-4 py-3 rounded hover:bg-gray-200 dark:hover:bg-gray-700 mt-2"
                     onClick={() => {
-                      window.location.href = "/dashboard";
+                      navigate("/dashboard");
                       setMenuOpen(false);
                     }}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
                   >
                     Dashboard
                   </button>
                   <button
-                    className="w-full text-left px-4 py-3 rounded hover:bg-gray-200 dark:hover:bg-gray-700 mt-1"
                     onClick={() => {
                       onLogout();
                       setMenuOpen(false);
                     }}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
                   >
                     Logout
                   </button>
@@ -226,18 +200,12 @@ const Navbar = () => {
         </>
       )}
 
-      {/* Dropdown fade-in animation CSS */}
+      {/* Dropdown Animation CSS */}
       <style>
         {`
           @keyframes fadeInDropdown {
-            from {
-              opacity: 0;
-              transform: translateY(-10px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
           }
         `}
       </style>

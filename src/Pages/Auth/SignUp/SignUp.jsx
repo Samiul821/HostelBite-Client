@@ -104,10 +104,11 @@ const SignUp = () => {
 
         console.log("Google Sign In User:", user);
         const userInfo = {
-          name: user.name,
+          name: user.displayName,
           email: user.email,
           role: "user",
           badge: "Bronze",
+          profileImage: user.photoURL,
           createdAt: new Date().toISOString(),
           lastLogin: new Date().toISOString(),
         };
