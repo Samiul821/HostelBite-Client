@@ -11,9 +11,7 @@ const AuthLaout = () => {
       <header>
         <Navbar></Navbar>
       </header>
-      <main
-        className={`min-h-[calc(100vh-150px)] px-[3%] lg:px-[10%] ${colors.background}`}
-      >
+      <main className={`min-h-[calc(100vh-150px)]  ${colors.background}`}>
         <Outlet></Outlet>
       </main>
     </div>

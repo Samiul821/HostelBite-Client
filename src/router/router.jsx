@@ -4,6 +4,7 @@ import RootLayout from "../Layout/RootLayout";
 import Home from "../Pages/Home/Home/Home";
 import AuthLaout from "../Layout/AuthLaout";
 import Login from "../Pages/Auth/Login/Login";
+import SignUp from "../Pages/Auth/SignUp/SignUp";
 
 const router = createBrowserRouter([
   {
@@ -21,11 +22,15 @@ const router = createBrowserRouter([
     Component: AuthLaout,
     children: [
       {
-        path: '/login',
-        Component: Login
-      }
-    ]
-  }
+        path: "/login",
+        Component: Login,
+      },
+      {
+        path: "signup",
+        Component: SignUp,
+      },
+    ],
+  },
 ]);
 
 export default router;

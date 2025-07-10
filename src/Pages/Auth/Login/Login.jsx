@@ -1,107 +1,205 @@
-import React from "react";
+import { useState } from "react";
+
 import { useForm } from "react-hook-form";
-import { FaGoogle, FaFacebook } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
-import useAuth from "../../../Hooks/useAuth";
-import { useMutation } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+import { FcGoogle } from "react-icons/fc";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { Link } from "react-router-dom";
+import { useTheme } from "../../../Hooks/useTheme";
 
 const Login = () => {
-  const { signIn, googleSignIn, facebookSignIn } = useAuth();
+  const { isDark } = useTheme();
+  const [showPassword, setShowPassword] = useState(false);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
   } = useForm();
-  const navigate = useNavigate();
 
-  // Email-password login mutation (React Query v4+ style)
-  const loginMutation = useMutation({
-    mutationFn: ({ email, password }) => signIn(email, password),
-    onSuccess: () => {
-      reset();
-      navigate("/");
-    },
-    onError: (error) => {
-      alert("Login Failed: " + error.message);
-    },
-  });
-
-  const handleEmailLogin = (data) => {
-    loginMutation.mutate(data);
+  const handleSignIn = (data) => {
+    console.log(data); // You can integrate login logic here
   };
 
-  // Google login হ্যান্ডলার
-  const handleGoogleLogin = () => {
-    googleSignIn()
-      .then(() => navigate("/"))
-      .catch((err) => alert("Google login failed: " + err.message));
+  const handleGoogleSignIn = () => {
+    console.log("Google Sign-In");
   };
 
-  // Facebook login হ্যান্ডলার
-  const handleFacebookLogin = () => {
-    facebookSignIn()
-      .then(() => navigate("/"))
-      .catch((err) => alert("Facebook login failed: " + err.message));
+  const handlePasswordReset = () => {
+    console.log("Reset Password Triggered");
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-blue-100 p-4">
-      <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8">
-        <h2 className="text-3xl font-bold text-indigo-600 mb-6 text-center">
-          Login
-        </h2>
-
-        <form onSubmit={handleSubmit(handleEmailLogin)} className="space-y-4">
-          <input
-            type="email"
-            placeholder="Email"
-            {...register("email", { required: "Email is required" })}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-          {errors.email && (
-            <p className="text-red-500 text-sm">{errors.email.message}</p>
-          )}
-
-          <input
-            type="password"
-            placeholder="Password"
-            {...register("password", { required: "Password is required" })}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-          {errors.password && (
-            <p className="text-red-500 text-sm">{errors.password.message}</p>
-          )}
-
-          <button
-            type="submit"
-            disabled={loginMutation.isLoading}
-            className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-500 transition font-semibold"
+    <div
+      className={`min-h-screen flex items-center justify-center px-[3%] lg:px-[10%] py-10 transition-colors duration-300 ${
+        isDark
+          ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
+          : "bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100"
+      }`}
+    >
+      <motion.div
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className={`w-full max-w-4xl rounded-3xl shadow-2xl p-8 md:p-10 lg:p-12 flex flex-col-reverse md:flex-row gap-8 items-center relative overflow-hidden transition-colors duration-300 ${
+          isDark
+            ? "bg-gray-800 text-gray-200 border border-gray-600"
+            : "bg-white backdrop-blur-md bg-opacity-70"
+        }`}
+      >
+        {/* Left Side - Form */}
+        <div className="w-full md:w-1/2">
+          <h2
+            className={`text-3xl sm:text-4xl font-bold mb-6 text-center md:text-left font-poppins ${
+              isDark ? "text-white" : "text-gray-800"
+            }`}
           >
-            {loginMutation.isLoading ? "Logging in..." : "Login"}
-          </button>
-        </form>
+            Welcome Back
+          </h2>
 
-        <div className="my-6 text-center text-gray-500">OR</div>
+          <form onSubmit={handleSubmit(handleSignIn)} className="space-y-6">
+            {/* Email */}
+            <div>
+              <label
+                htmlFor="email"
+                className={`block mb-1 text-sm font-medium ${
+                  isDark ? "text-gray-300" : "text-gray-700"
+                }`}
+              >
+                Email Address
+              </label>
+              <input
+                type="email"
+                {...register("email", { required: true })}
+                placeholder="you@example.com"
+                className={`w-full px-4 py-3 rounded-xl border text-sm placeholder-gray-400 transition focus:outline-none focus:ring-4 ${
+                  isDark
+                    ? "bg-gray-900 border-gray-600 text-white focus:ring-indigo-500"
+                    : "bg-white border-gray-300 text-gray-900 focus:ring-indigo-400"
+                }`}
+              />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">Email is required</p>
+              )}
+            </div>
 
-        <div className="space-y-4">
-          <button
-            onClick={handleGoogleLogin}
-            className="w-full flex items-center justify-center space-x-3 border border-gray-300 rounded py-2 hover:bg-gray-100 transition"
+            {/* Password */}
+            <div className="relative">
+              <label
+                className={`block mb-1 text-sm font-medium ${
+                  isDark ? "text-gray-300" : "text-gray-700"
+                }`}
+              >
+                Password
+              </label>
+              <input
+                type={showPassword ? "text" : "password"}
+                {...register("password", { required: true })}
+                placeholder="••••••••"
+                className={`w-full px-4 py-3 pr-12 rounded-xl border text-sm placeholder-gray-400 transition focus:outline-none focus:ring-4 ${
+                  isDark
+                    ? "bg-gray-900 border-gray-600 text-white focus:ring-indigo-500"
+                    : "bg-white border-gray-300 text-gray-900 focus:ring-indigo-400"
+                }`}
+              />
+              <span
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-9 cursor-pointer text-gray-500"
+              >
+                {showPassword ? (
+                  <AiOutlineEyeInvisible size={20} />
+                ) : (
+                  <AiOutlineEye size={20} />
+                )}
+              </span>
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">
+                  Password is required
+                </p>
+              )}
+            </div>
+
+            {/* Remember & Forgot */}
+            <div
+              className={`flex items-center justify-between text-sm ${
+                isDark ? "text-gray-400" : "text-gray-600"
+              }`}
+            >
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  className="accent-indigo-600 w-5 h-5 rounded-md"
+                />
+                <span>Remember me</span>
+              </label>
+              <button
+                type="button"
+                onClick={handlePasswordReset}
+                className="text-indigo-500 hover:underline focus:outline-none"
+              >
+                Forgot password?
+              </button>
+            </div>
+
+            {/* Submit Button */}
+            <motion.button
+              type="submit"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 15 }}
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl shadow-md focus:outline-none focus:ring-4 focus:ring-indigo-300"
+            >
+              Sign In
+            </motion.button>
+          </form>
+
+          {/* Google Sign In */}
+          <div className="mt-6">
+            <motion.button
+              onClick={handleGoogleSignIn}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 15 }}
+              className={`w-full flex items-center justify-center gap-3 font-semibold py-3 rounded-xl shadow-sm transition focus:outline-none focus:ring-4 ${
+                isDark
+                  ? "bg-gray-700 text-gray-200 border border-gray-600 hover:bg-gray-600 focus:ring-indigo-500"
+                  : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-100 focus:ring-indigo-200"
+              }`}
+            >
+              <FcGoogle size={22} />
+              Sign in with Google
+            </motion.button>
+          </div>
+
+          {/* Signup Link */}
+          <p
+            className={`text-center mt-6 text-sm ${
+              isDark ? "text-gray-400" : "text-gray-600"
+            }`}
           >
-            <FaGoogle className="text-red-500" />{" "}
-            <span>Continue with Google</span>
-          </button>
-
-          <button
-            onClick={handleFacebookLogin}
-            className="w-full flex items-center justify-center space-x-3 border border-gray-300 rounded py-2 hover:bg-gray-100 transition"
-          >
-            <FaFacebook className="text-blue-600" />{" "}
-            <span>Continue with Facebook</span>
-          </button>
+            Don&apos;t have an account?{" "}
+            <Link
+              to="/signup"
+              className="text-indigo-500 font-semibold hover:underline"
+            >
+              Sign up
+            </Link>
+          </p>
         </div>
-      </div>
+
+        {/* Right Side Placeholder (optional image or graphic) */}
+        <div className="w-full md:w-1/2 hidden md:flex items-center justify-center">
+          <div
+            className={`w-full h-60 rounded-2xl flex items-center justify-center text-4xl font-bold ${
+              isDark
+                ? "bg-gray-700 text-gray-200"
+                : "bg-indigo-100 text-indigo-600"
+            }`}
+          >
+            HostelBite
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 };
