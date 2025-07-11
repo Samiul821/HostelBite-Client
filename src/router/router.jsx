@@ -8,6 +8,7 @@ import SignUp from "../Pages/Auth/SignUp/SignUp";
 import PrivateRoute from "../routes/PrivateRoute";
 import DashboardLayout from "../Layout/DashboardLayout";
 import DashboardHome from "../Pages/Dashboard/DashboardHome/DashboardHome";
+import AddMeal from "../Pages/Dashboard/AddMeal/AddMeal";
 
 const router = createBrowserRouter([
   {
@@ -44,9 +45,13 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        Component: DashboardHome
-      }
-    ]
+        Component: DashboardHome,
+      },
+      {
+        path: "add-meal",
+        element: <AddMeal></AddMeal>,
+      },
+    ],
   },
 ]);
 

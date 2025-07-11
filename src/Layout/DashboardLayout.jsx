@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
-import { FaBars, FaHome, FaSignOutAlt, FaTachometerAlt } from "react-icons/fa";
+import { FaBars, FaHome, FaSignOutAlt, FaTachometerAlt, FaUtensils } from "react-icons/fa";
 import { useTheme } from "../Hooks/useTheme";
 import useAuth from "../Hooks/useAuth";
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { isDark, colors } = useTheme();
-  const { logOut } = useAuth();
+  const { logOut, user } = useAuth();
 
   const handleLogout = () => {
     logOut().then(() => {
@@ -18,6 +18,15 @@ const DashboardLayout = () => {
   const navItems = [
     { name: "Main Site", to: "/", icon: <FaHome /> },
     { name: "Dashboard Home", to: "/dashboard", icon: <FaTachometerAlt /> },
+    // admin route
+    { name: "Add Meal", to: "/dashboard/add-meal", icon: <FaUtensils /> },
+    {name: "Manege Users", to: "/dashboard/manege-users",icon: <FaUtensils /> },
+    {name: "All Meals", to: "/dashboard/all-meals",icon: <FaUtensils /> },
+    {name: "All Reviews", to: "/dashboard/all-reviews",icon: <FaUtensils /> },
+    {name: "Serve Meals", to: "/dashboard/serve-meals",icon: <FaUtensils /> },
+    {name: "Serve Meals", to: "/dashboard/serve-meals",icon: <FaUtensils /> },
+    {name: "Upcoming Meals", to: "/dashboard/upcoming-meals",icon: <FaUtensils /> },
+    {name: "Admin Profile", to: "/dashboard/admin-profile",icon: <FaUtensils /> },
   ];
 
   return (
