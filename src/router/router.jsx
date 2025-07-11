@@ -9,6 +9,7 @@ import PrivateRoute from "../routes/PrivateRoute";
 import DashboardLayout from "../Layout/DashboardLayout";
 import DashboardHome from "../Pages/Dashboard/DashboardHome/DashboardHome";
 import AddMeal from "../Pages/Dashboard/AddMeal/AddMeal";
+import AdminRoute from "../routes/AdminRoute";
 
 const router = createBrowserRouter([
   {
@@ -47,9 +48,16 @@ const router = createBrowserRouter([
         index: true,
         Component: DashboardHome,
       },
+      // User Route
+
+      // Adimin route
       {
         path: "add-meal",
-        element: <AddMeal></AddMeal>,
+        element: (
+          <AdminRoute>
+            <AddMeal></AddMeal>
+          </AdminRoute>
+        ),
       },
     ],
   },
