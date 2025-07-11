@@ -10,6 +10,9 @@ import DashboardLayout from "../Layout/DashboardLayout";
 import DashboardHome from "../Pages/Dashboard/DashboardHome/DashboardHome";
 import AddMeal from "../Pages/Dashboard/AddMeal/AddMeal";
 import AdminRoute from "../routes/AdminRoute";
+import MyProfile from "../Pages/Dashboard/MyProfile/MyProfile";
+import Checkout from "../Pages/Checkout/Checkout";
+import LoadingSpinner from "../Pages/Shared/LoadingSpinner/LoadingSpinner";
 
 const router = createBrowserRouter([
   {
@@ -19,6 +22,14 @@ const router = createBrowserRouter([
       {
         index: true,
         Component: Home,
+      },
+      {
+        path: "/checkout/:packageId",
+        element: (
+          <PrivateRoute>
+            <Checkout />
+          </PrivateRoute>
+        ),
       },
     ],
   },
@@ -49,6 +60,10 @@ const router = createBrowserRouter([
         Component: DashboardHome,
       },
       // User Route
+      {
+        path: "my-profile",
+        element: <MyProfile></MyProfile>,
+      },
 
       // Adimin route
       {

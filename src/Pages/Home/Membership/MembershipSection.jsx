@@ -1,37 +1,24 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import useAxios from "../../../Hooks/useAxios";
 import { useTheme } from "../../../Hooks/useTheme";
-
-const packages = [
-  {
-    name: "Silver",
-    price: 9.99,
-    features: ["2 Meals / Day", "Basic Support", "Access to Daily Menu"],
-    colorLight: "border-gray-400",
-    colorDark: "border-gray-600",
-  },
-  {
-    name: "Gold",
-    price: 19.99,
-    features: ["3 Meals / Day", "Priority Support", "Weekly Special Meals"],
-    colorLight: "border-yellow-500",
-    colorDark: "border-yellow-400",
-  },
-  {
-    name: "Platinum",
-    price: 29.99,
-    features: ["3 Meals + Snacks", "24/7 Support", "Personalized Meal Plan"],
-    colorLight: "border-indigo-600",
-    colorDark: "border-indigo-500",
-  },
-];
 
 const MembershipSection = () => {
   const { isDark } = useTheme();
+  const axios = useAxios();
+  const [packages, setPackages] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("/packages")
+      .then((res) => setPackages(res.data))
+      .catch((err) => console.error("Failed to load packages:", err));
+  }, [axios]);
 
   return (
     <section>
-      <div className="max-w-7xl mx-auto text-center">
+      <div className="max-w-7xl mx-auto text-center px-4">
         <h2
           className={`text-3xl md:text-4xl font-bold mb-4 ${
             isDark ? "text-indigo-400" : ""
@@ -77,7 +64,7 @@ const MembershipSection = () => {
                 ))}
               </ul>
               <Link
-                to={`/checkout/${pkg.name.toLowerCase()}`}
+                to={`/checkout/${pkg._id}`}
                 className="mt-auto bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition"
               >
                 Get Started
