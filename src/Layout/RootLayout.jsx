@@ -12,7 +12,7 @@ const RootLayout = () => {
       <header>
         <Navbar></Navbar>
       </header>
-      <main className={`min-h-[calc(100vh-150px)] px-[3%] lg:px-[10%] ${colors.background}`}>
+      <main className={`min-h-[calc(100vh-150px)] px-[3%] lg:px-[10%] py-8 ${colors.background}`}>
         <Outlet></Outlet>
       </main>
       <footer>

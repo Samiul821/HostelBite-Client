@@ -14,6 +14,7 @@ import MyProfile from "../Pages/Dashboard/MyProfile/MyProfile";
 import Checkout from "../Pages/Checkout/Checkout";
 import LoadingSpinner from "../Pages/Shared/LoadingSpinner/LoadingSpinner";
 import MealDetails from "../Pages/MealDetails/MealDetails";
+import Meals from "../Pages/Meals/Meals";
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
       {
         index: true,
         Component: Home,
+      },
+      {
+        path: "/meals",
+        Component: Meals
       },
       {
         path: "/meals-details/:id",
