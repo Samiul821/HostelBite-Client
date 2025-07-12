@@ -46,8 +46,8 @@ const MyReviews = () => {
     });
   }, [user?.email, axiosSecure]);
 
-  const handleDelete = (id) => {
-    Swal.fire({
+  const handleDelete = async (id) => {
+    const result = await Swal.fire({
       title: "Are you sure?",
       text: "This review will be deleted!",
       icon: "warning",
@@ -55,16 +55,22 @@ const MyReviews = () => {
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
       confirmButtonText: "Yes, delete it!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        axiosSecure.delete(`/reviews/${id}`).then((res) => {
-          if (res.data.deletedCount > 0) {
-            setReviews((prev) => prev.filter((r) => r._id !== id));
-            Swal.fire("Deleted!", "Your review has been deleted.", "success");
-          }
-        });
-      }
     });
+
+    if (result.isConfirmed) {
+      try {
+        const res = await axiosSecure.delete(`/reviews/${id}`);
+        if (res.data?.deletedCount > 0) {
+          setReviews((prev) => prev.filter((r) => r._id !== id));
+          Swal.fire("Deleted!", "Your review has been deleted.", "success");
+        } else {
+          Swal.fire("Failed!", "Review not found or already deleted.", "error");
+        }
+      } catch (err) {
+        console.error(err);
+        Swal.fire("Error!", "Something went wrong!", "error");
+      }
+    }
   };
 
   return (
