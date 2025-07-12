@@ -13,6 +13,7 @@ import AdminRoute from "../routes/AdminRoute";
 import MyProfile from "../Pages/Dashboard/MyProfile/MyProfile";
 import Checkout from "../Pages/Checkout/Checkout";
 import LoadingSpinner from "../Pages/Shared/LoadingSpinner/LoadingSpinner";
+import MealDetails from "../Pages/MealDetails/MealDetails";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,14 @@ const router = createBrowserRouter([
       {
         index: true,
         Component: Home,
+      },
+      {
+        path: "/meals-details/:id",
+        element: (
+          <PrivateRoute>
+            <MealDetails></MealDetails>
+          </PrivateRoute>
+        ),
       },
       {
         path: "/checkout/:packageId",
