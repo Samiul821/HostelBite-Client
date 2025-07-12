@@ -18,6 +18,7 @@ import Meals from "../Pages/Meals/Meals";
 import RequestedMeals from "../Pages/Dashboard/ReqMeals/RequestedMeals ";
 import MyReviews from "../Pages/Dashboard/MyReviews/MyReviews";
 import PayHistory from "../Pages/Dashboard/PayHistory/PayHistory";
+import ManageUsers from "../Pages/Dashboard/ManageUsers/ManageUsers";
 
 const router = createBrowserRouter([
   {
@@ -103,6 +104,10 @@ const router = createBrowserRouter([
           </AdminRoute>
         ),
       },
+      {
+        path: "manege-users",
+        element: <AdminRoute><ManageUsers></ManageUsers></AdminRoute>
+      }
     ],
   },
 ]);
