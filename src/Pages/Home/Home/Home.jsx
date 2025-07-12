@@ -5,7 +5,7 @@ import MealsByCategory from "../MealsByCategory/MealsByCategory";
 
 const Home = () => {
   return (
-    <div className="py-10 space-y-16">
+    <div className=" space-y-16">
       <Banner></Banner>
       <MealsByCategory></MealsByCategory>
       <MembershipSection></MembershipSection>
