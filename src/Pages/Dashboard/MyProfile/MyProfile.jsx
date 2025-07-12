@@ -149,22 +149,6 @@ const MyProfile = () => {
             )}
           </div>
 
-          {/* Badge */}
-          <div>
-            <label className="block font-medium">Badge</label>
-            <select
-              {...register("badge", { required: "Badge is required" })}
-              className="select select-bordered w-full"
-              defaultValue={profile.badge}
-            >
-              <option value="Bronze">Bronze</option>
-              <option value="Gold">Gold</option>
-            </select>
-            {errors.badge && (
-              <p className="text-red-500 text-sm">{errors.badge.message}</p>
-            )}
-          </div>
-
           {/* Image */}
           <div>
             <label className="block font-medium">New Profile Image</label>

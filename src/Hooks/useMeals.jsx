@@ -22,7 +22,7 @@ const useMeals = (filters) => {
   useEffect(() => {
     const fetchMeals = async () => {
       try {
-        const res = await axiosInstance.get("/meals", {
+        const res = await axiosInstance.get("/all-meals", {
           params: { ...filtersRef.current, page, limit: 6 },
         });
 

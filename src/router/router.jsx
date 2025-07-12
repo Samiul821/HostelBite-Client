@@ -15,6 +15,7 @@ import Checkout from "../Pages/Checkout/Checkout";
 import LoadingSpinner from "../Pages/Shared/LoadingSpinner/LoadingSpinner";
 import MealDetails from "../Pages/MealDetails/MealDetails";
 import Meals from "../Pages/Meals/Meals";
+import RequestedMeals from "../Pages/Dashboard/ReqMeals/RequestedMeals ";
 
 const router = createBrowserRouter([
   {
@@ -74,6 +75,10 @@ const router = createBrowserRouter([
         Component: DashboardHome,
       },
       // User Route
+      {
+        path: "req-meals",
+        element: <RequestedMeals></RequestedMeals>
+      },
       {
         path: "my-profile",
         element: <MyProfile></MyProfile>,
