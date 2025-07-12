@@ -16,6 +16,8 @@ import LoadingSpinner from "../Pages/Shared/LoadingSpinner/LoadingSpinner";
 import MealDetails from "../Pages/MealDetails/MealDetails";
 import Meals from "../Pages/Meals/Meals";
 import RequestedMeals from "../Pages/Dashboard/ReqMeals/RequestedMeals ";
+import MyReviews from "../Pages/Dashboard/MyReviews/MyReviews";
+import PayHistory from "../Pages/Dashboard/PayHistory/PayHistory";
 
 const router = createBrowserRouter([
   {
@@ -28,7 +30,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/meals",
-        Component: Meals
+        Component: Meals,
       },
       {
         path: "/meals-details/:id",
@@ -77,7 +79,15 @@ const router = createBrowserRouter([
       // User Route
       {
         path: "req-meals",
-        element: <RequestedMeals></RequestedMeals>
+        element: <RequestedMeals></RequestedMeals>,
+      },
+      {
+        path: "my-reviews",
+        element: <MyReviews></MyReviews>,
+      },
+      {
+        path: "pay-history",
+        element: <PayHistory></PayHistory>,
       },
       {
         path: "my-profile",

@@ -17,6 +17,7 @@ import { useTheme } from "../Hooks/useTheme";
 import useAuth from "../Hooks/useAuth";
 import useUserRole from "../Hooks/useUserRole";
 import toast from "react-hot-toast";
+import LoadingSpinner from "../Pages/Shared/LoadingSpinner/LoadingSpinner";
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -37,7 +38,7 @@ const DashboardLayout = () => {
       });
   };
 
-  if (roleLoading) return <p className="p-6">Loading Dashboard...</p>;
+  if (roleLoading) return <LoadingSpinner></LoadingSpinner>;
 
   return (
     <div className={`flex h-screen ${colors.background} ${colors.text}`}>
