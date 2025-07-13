@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import { FaHeart, FaEdit, FaTrash, FaEye } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import MealDetailsModal from "./MealDetailsModal ";
 
@@ -14,7 +14,6 @@ const AllMeals = () => {
   const limit = 10;
 
   const axiosSecure = useAxiosSecure();
-  const navigate = useNavigate();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState(null);
@@ -145,13 +144,13 @@ const AllMeals = () => {
                   <td className="p-2">{meal.rating || 0}</td>
                   <td className="p-2">{meal.distributor_name || "-"}</td>
                   <td className="p-2 flex gap-3">
-                    <button
-                      onClick={() => navigate(`/update-meal/${meal._id}`)}
+                    <Link
+                      to={`/dashboard/update-meal/${meal._id}`}
                       className="text-blue-600 hover:underline"
                       title="Update Meal"
                     >
                       <FaEdit />
-                    </button>
+                    </Link>
                     <button
                       onClick={() => handleDelete(meal._id)}
                       className="text-red-600 hover:underline"

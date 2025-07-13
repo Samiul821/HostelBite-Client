@@ -20,6 +20,7 @@ import MyReviews from "../Pages/Dashboard/MyReviews/MyReviews";
 import PayHistory from "../Pages/Dashboard/PayHistory/PayHistory";
 import ManageUsers from "../Pages/Dashboard/ManageUsers/ManageUsers";
 import AllMeals from "../Pages/Dashboard/AllMeals/AllMeals";
+import UpdateMeal from "../Pages/Dashboard/AllMeals/UpdateMeal";
 
 const router = createBrowserRouter([
   {
@@ -118,6 +119,14 @@ const router = createBrowserRouter([
         element: (
           <AdminRoute>
             <AllMeals></AllMeals>
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "update-meal/:id",
+        element: (
+          <AdminRoute>
+            <UpdateMeal />
           </AdminRoute>
         ),
       },
