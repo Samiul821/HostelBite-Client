@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import { FaHeart, FaEdit, FaTrash, FaEye } from "react-icons/fa";
 import useAuth from "../../../Hooks/useAuth";
@@ -6,16 +6,33 @@ import { useTheme } from "../../../Hooks/useTheme";
 import Swal from "sweetalert2";
 import MealModal from "./MealModal";
 import EditReviewModal from "./EditReviewModal";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 const MyReviews = () => {
-  const [reviews, setReviews] = useState([]);
   const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
   const { isDark } = useTheme();
+  const queryClient = useQueryClient();
+
   const [selectedMeal, setSelectedMeal] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingReview, setEditingReview] = useState(null);
+
+  // ✅ Fetch reviews using TanStack Query
+  const {
+    data: reviews = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["myReviews", user?.email],
+    enabled: !!user?.email,
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/my-reviews?email=${user.email}`);
+      return res.data;
+    },
+  });
 
   const openEditModal = (review) => {
     setEditingReview(review);
@@ -27,24 +44,20 @@ const MyReviews = () => {
     setEditingReview(null);
   };
 
-  const handleViewMeal = (id) => {
-    axiosSecure.get(`/meals/${id}`).then((res) => {
+  const handleViewMeal = async (id) => {
+    try {
+      const res = await axiosSecure.get(`/meals/${id}`);
       setSelectedMeal(res.data);
       setModalOpen(true);
-    });
+    } catch (err) {
+      console.error("Failed to fetch meal:", err);
+    }
   };
 
   const closeModal = () => {
     setModalOpen(false);
     setSelectedMeal(null);
   };
-
-  useEffect(() => {
-    if (!user?.email) return;
-    axiosSecure.get(`/my-reviews?email=${user.email}`).then((res) => {
-      setReviews(res.data);
-    });
-  }, [user?.email, axiosSecure]);
 
   const handleDelete = async (id) => {
     const result = await Swal.fire({
@@ -61,8 +74,10 @@ const MyReviews = () => {
       try {
         const res = await axiosSecure.delete(`/reviews/${id}`);
         if (res.data?.deletedCount > 0) {
-          setReviews((prev) => prev.filter((r) => r._id !== id));
           Swal.fire("Deleted!", "Your review has been deleted.", "success");
+          queryClient.invalidateQueries({
+            queryKey: ["myReviews", user?.email],
+          });
         } else {
           Swal.fire("Failed!", "Review not found or already deleted.", "error");
         }
@@ -72,6 +87,22 @@ const MyReviews = () => {
       }
     }
   };
+
+  const handleReviewUpdate = () => {
+    queryClient.invalidateQueries({ queryKey: ["myReviews", user?.email] });
+  };
+
+  if (isLoading) {
+    return <p className="text-center mt-10 text-lg">Loading your reviews...</p>;
+  }
+
+  if (isError) {
+    return (
+      <p className="text-center mt-10 text-red-500">
+        Error: {error.message || "Failed to load reviews"}
+      </p>
+    );
+  }
 
   return (
     <div
@@ -100,50 +131,50 @@ const MyReviews = () => {
             </tr>
           </thead>
           <tbody>
-            {reviews.map((review) => (
-              <tr
-                key={review._id}
-                className={`transition-all duration-200 hover:scale-[1.01] hover:shadow-lg ${
-                  isDark
-                    ? "hover:bg-gray-800"
-                    : "hover:bg-gradient-to-r hover:from-pink-50 hover:to-orange-50"
-                }`}
-              >
-                <td className="p-4 font-semibold">
-                  {review.mealDetails?.title}
-                </td>
-                <td className="p-4 flex items-center gap-1">
-                  <FaHeart className="text-red-500" />{" "}
-                  {review.mealDetails?.likes || 0}
-                </td>
-                <td className="p-4">{review.review}</td>
-                <td className="p-4 flex gap-4 text-lg">
-                  <button
-                    onClick={() => openEditModal(review)}
-                    title="Edit"
-                    className="text-blue-500"
-                  >
-                    <FaEdit />
-                  </button>
-
-                  <button
-                    onClick={() => handleDelete(review._id)}
-                    title="Delete"
-                    className="text-red-500 hover:text-red-600 transition"
-                  >
-                    <FaTrash />
-                  </button>
-                  <button
-                    onClick={() => handleViewMeal(review.mealId)}
-                    title="View Meal"
-                    className="text-green-500 hover:text-green-600 transition"
-                  >
-                    <FaEye />
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {reviews.length === 0 && (
+            {reviews.length > 0 ? (
+              reviews.map((review) => (
+                <tr
+                  key={review._id}
+                  className={`transition-all duration-200 hover:scale-[1.01] hover:shadow-lg ${
+                    isDark
+                      ? "hover:bg-gray-800"
+                      : "hover:bg-gradient-to-r hover:from-pink-50 hover:to-orange-50"
+                  }`}
+                >
+                  <td className="p-4 font-semibold">
+                    {review.mealDetails?.title}
+                  </td>
+                  <td className="p-4 flex items-center gap-1">
+                    <FaHeart className="text-red-500" />
+                    {review.mealDetails?.likes || 0}
+                  </td>
+                  <td className="p-4">{review.review}</td>
+                  <td className="p-4 flex gap-4 text-lg">
+                    <button
+                      onClick={() => openEditModal(review)}
+                      title="Edit"
+                      className="text-blue-500"
+                    >
+                      <FaEdit />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(review._id)}
+                      title="Delete"
+                      className="text-red-500 hover:text-red-600 transition"
+                    >
+                      <FaTrash />
+                    </button>
+                    <button
+                      onClick={() => handleViewMeal(review.mealId)}
+                      title="View Meal"
+                      className="text-green-500 hover:text-green-600 transition"
+                    >
+                      <FaEye />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
               <tr>
                 <td colSpan="4" className="text-center py-6 text-gray-500">
                   No reviews found.
@@ -154,22 +185,19 @@ const MyReviews = () => {
         </table>
       </div>
 
-      {/* Modal */}
+      {/* Meal View Modal */}
       <MealModal
         isOpen={modalOpen}
         closeModal={closeModal}
         meal={selectedMeal}
       />
+
+      {/* Edit Review Modal */}
       <EditReviewModal
         isOpen={editModalOpen}
         reviewData={editingReview}
         onClose={closeEditModal}
-        onUpdate={() => {
-          // Re-fetch reviews
-          axiosSecure.get(`/my-reviews?email=${user.email}`).then((res) => {
-            setReviews(res.data);
-          });
-        }}
+        onUpdate={handleReviewUpdate}
       />
     </div>
   );

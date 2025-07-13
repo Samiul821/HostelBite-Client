@@ -1,18 +1,41 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
 import { useTheme } from "../../Hooks/useTheme";
 
 const ReviewList = ({ mealId }) => {
   const axiosSecure = useAxiosSecure();
-  const [reviews, setReviews] = useState([]);
   const { isDark } = useTheme();
 
-  useEffect(() => {
-    axiosSecure
-      .get(`/reviews/${mealId}`)
-      .then((res) => setReviews(res.data))
-      .catch((err) => console.error("Review fetch failed", err));
-  }, [mealId, axiosSecure]);
+  const {
+    data: reviews = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["reviews", mealId],
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/reviews/${mealId}`);
+      return res.data;
+    },
+    enabled: !!mealId, // mealId না থাকলে fetch হবে না
+    refetchOnWindowFocus: false,
+  });
+
+  if (isLoading) {
+    return (
+      <p className={`text-sm ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+        Loading reviews...
+      </p>
+    );
+  }
+
+  if (isError) {
+    return (
+      <p className={`text-sm text-red-500`}>
+        Error: {error.message || "Failed to load reviews"}
+      </p>
+    );
+  }
 
   if (reviews.length === 0) {
     return (

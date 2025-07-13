@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useParams, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import useAuth from "../../../Hooks/useAuth";
 import Swal from "sweetalert2";
+import { useEffect, useState } from "react";
 
 const imageHostingKey = import.meta.env.VITE_IMAGEBB_KEY;
 const imageUploadUrl = `https://api.imgbb.com/1/upload?key=${imageHostingKey}`;
 
 const UpdateMeal = () => {
   const { id } = useParams();
-  const [step, setStep] = useState(1);
-  const [meal, setMeal] = useState(null);
   const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [step, setStep] = useState(1);
 
   const {
     register,
@@ -23,13 +23,24 @@ const UpdateMeal = () => {
     formState: { errors },
   } = useForm();
 
-  useEffect(() => {
-    axiosSecure.get(`/meals/${id}`).then((res) => {
-      setMeal(res.data);
-      reset(res.data);
-    });
-  }, [id, axiosSecure, reset]);
+  // Fetch single meal data using tanstack query
+  const { data: meal, isLoading } = useQuery({
+    queryKey: ["meal", id],
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/meals/${id}`);
+      return res.data;
+    },
+    enabled: !!id,
+  });
 
+  // Reset form with fetched meal data
+  useEffect(() => {
+    if (meal) {
+      reset(meal);
+    }
+  }, [meal, reset]);
+
+  // Submit handler
   const onSubmit = async (data) => {
     try {
       let imageUrl = meal.image;
@@ -68,6 +79,8 @@ const UpdateMeal = () => {
       Swal.fire("Error", "Failed to update meal", "error");
     }
   };
+
+  if (isLoading) return <p className="text-center mt-20">Loading...</p>;
 
   return (
     <div className="min-h-screen flex items-center justify-center">

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import useAuth from "../../../Hooks/useAuth";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import { useTheme } from "../../../Hooks/useTheme";
@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import Modal from "react-modal";
 import { useForm } from "react-hook-form";
 import axios from "axios";
-import { motion, AnimatePresence } from "framer-motion";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 const imageHostingKey = import.meta.env.VITE_IMAGEBB_KEY;
 const imageUploadUrl = `https://api.imgbb.com/1/upload?key=${imageHostingKey}`;
@@ -15,9 +15,8 @@ const MyProfile = () => {
   const { user, updateUser } = useAuth();
   const axiosSecure = useAxiosSecure();
   const { isDark } = useTheme();
+  const queryClient = useQueryClient();
 
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   const {
@@ -27,29 +26,31 @@ const MyProfile = () => {
     formState: { errors, isSubmitting },
   } = useForm();
 
-  useEffect(() => {
-    if (user?.email) {
-      axiosSecure
-        .get(`/user/profile?email=${user.email}`)
-        .then((res) => {
-          setProfile(res.data);
-          reset({
-            name: res.data.name,
-            badge: res.data.badge,
-          });
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.error(err);
-          toast.error("Failed to load profile");
-          setLoading(false);
-        });
-    }
-  }, [user, axiosSecure, reset]);
+  // ✅ Fetch profile data using TanStack Query
+  const {
+    data: profile,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["userProfile", user?.email],
+    enabled: !!user?.email,
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/user/profile?email=${user.email}`);
+      return res.data;
+    },
+    onSuccess: (data) => {
+      reset({
+        name: data.name,
+        badge: data.badge,
+      });
+    },
+  });
 
+  // ✅ Handle form submission
   const onSubmit = async (data) => {
     try {
-      let imageUrl = profile.profileImage;
+      let imageUrl = profile?.profileImage;
 
       if (data.image?.[0]) {
         const formData = new FormData();
@@ -58,10 +59,10 @@ const MyProfile = () => {
         imageUrl = imgRes?.data?.data?.url;
       }
 
-      // 1. Firebase update
+      // Firebase update
       await updateUser(data.name, imageUrl);
 
-      // 2. MongoDB update
+      // MongoDB update
       const res = await axiosSecure.patch("/user/update", {
         email: user.email,
         name: data.name,
@@ -71,13 +72,8 @@ const MyProfile = () => {
 
       if (res.data.modifiedCount > 0) {
         toast.success("Profile updated!");
-        setProfile((prev) => ({
-          ...prev,
-          name: data.name,
-          profileImage: imageUrl,
-          badge: data.badge,
-        }));
         setModalIsOpen(false);
+        queryClient.invalidateQueries(["userProfile"]); // ✅ refetch
       } else {
         toast.error("No changes made");
       }
@@ -87,7 +83,13 @@ const MyProfile = () => {
     }
   };
 
-  if (loading) return <p className="text-center">Loading profile...</p>;
+  if (isLoading) return <p className="text-center">Loading profile...</p>;
+  if (isError)
+    return (
+      <p className="text-center text-red-500">
+        Error: {error.message || "Failed to load profile"}
+      </p>
+    );
   if (!profile) return <p className="text-center">No profile found.</p>;
 
   return (

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import { FaHeart, FaEdit, FaTrash, FaEye } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -6,14 +7,13 @@ import Swal from "sweetalert2";
 import MealDetailsModal from "./MealDetailsModal ";
 
 const AllMeals = () => {
-  const [meals, setMeals] = useState([]);
-  const [totalMeals, setTotalMeals] = useState(0);
+  const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState("");
   const [order, setOrder] = useState("desc");
-  const [page, setPage] = useState(1);
   const limit = 10;
 
   const axiosSecure = useAxiosSecure();
+  const queryClient = useQueryClient();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState(null);
@@ -23,30 +23,31 @@ const AllMeals = () => {
     setIsModalOpen(true);
   };
 
-  // Fetch meals from server
-  const fetchMeals = () => {
-    let url = `/all-meals?page=${page}&limit=${limit}`;
+  // Fetch meals query
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["all-meals", page, sortBy, order],
+    queryFn: async () => {
+      let url = `/all-meals?page=${page}&limit=${limit}`;
+      if (sortBy) url += `&sortBy=${sortBy}&order=${order}`;
+      const res = await axiosSecure.get(url);
+      return res.data;
+    },
+    keepPreviousData: true,
+  });
 
-    if (sortBy) {
-      url += `&sortBy=${sortBy}&order=${order}`;
-    }
+  // Delete meal mutation
+  const deleteMutation = useMutation({
+    mutationFn: (id) => axiosSecure.delete(`/meals/${id}`),
+    onSuccess: (_, id) => {
+      Swal.fire("Deleted!", "Meal has been deleted.", "success");
+      // Refetch meals after delete
+      queryClient.invalidateQueries(["all-meals"]);
+    },
+    onError: () => {
+      Swal.fire("Error!", "Failed to delete meal.", "error");
+    },
+  });
 
-    axiosSecure
-      .get(url)
-      .then((res) => {
-        setMeals(res.data.meals);
-        setTotalMeals(res.data.total);
-      })
-      .catch((err) => {
-        console.error("Fetch meals error:", err);
-      });
-  };
-
-  useEffect(() => {
-    fetchMeals();
-  }, [page, sortBy, order]);
-
-  // Handle delete meal
   const handleDelete = (id) => {
     Swal.fire({
       title: "Are you sure?",
@@ -58,25 +59,14 @@ const AllMeals = () => {
       confirmButtonText: "Yes, delete it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        axiosSecure
-          .delete(`/meals/${id}`)
-          .then((res) => {
-            if (res.data.deletedCount > 0) {
-              Swal.fire("Deleted!", "Meal has been deleted.", "success");
-              fetchMeals();
-            }
-          })
-          .catch((err) => {
-            Swal.fire("Error!", "Failed to delete meal.", "error");
-          });
+        deleteMutation.mutate(id);
       }
     });
   };
 
-  // Handle sorting change
+  // Sorting toggle
   const handleSortChange = (field) => {
     if (sortBy === field) {
-      // Toggle order
       setOrder(order === "asc" ? "desc" : "asc");
     } else {
       setSortBy(field);
@@ -84,7 +74,9 @@ const AllMeals = () => {
     }
   };
 
-  // Pagination controls (basic example)
+  // Calculate total pages safely
+  const totalMeals = data?.total || 0;
+  const meals = data?.meals || [];
   const totalPages = Math.ceil(totalMeals / limit);
 
   return (
@@ -97,44 +89,42 @@ const AllMeals = () => {
           className={`px-4 py-2 rounded border ${
             sortBy === "likes" ? "bg-blue-600 text-white" : "bg-gray-200"
           }`}
+          disabled={isLoading}
         >
-          Sort by Likes{" "}
-          {sortBy === "likes" ? (order === "asc" ? "↑" : "↓") : ""}
+          Sort by Likes {sortBy === "likes" ? (order === "asc" ? "↑" : "↓") : ""}
         </button>
         <button
           onClick={() => handleSortChange("reviews_count")}
           className={`px-4 py-2 rounded border ${
-            sortBy === "reviews_count"
-              ? "bg-blue-600 text-white"
-              : "bg-gray-200"
+            sortBy === "reviews_count" ? "bg-blue-600 text-white" : "bg-gray-200"
           }`}
+          disabled={isLoading}
         >
-          Sort by Reviews{" "}
-          {sortBy === "reviews_count" ? (order === "asc" ? "↑" : "↓") : ""}
+          Sort by Reviews {sortBy === "reviews_count" ? (order === "asc" ? "↑" : "↓") : ""}
         </button>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="table w-full border border-gray-300">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="p-2 text-left">Title</th>
-              <th className="p-2 text-left">Likes</th>
-              <th className="p-2 text-left">Reviews Count</th>
-              <th className="p-2 text-left">Rating</th>
-              <th className="p-2 text-left">Distributor</th>
-              <th className="p-2 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {meals.length === 0 ? (
+      {isLoading ? (
+        <p className="text-center">Loading meals...</p>
+      ) : isError ? (
+        <p className="text-center text-red-500">Failed to load meals.</p>
+      ) : meals.length === 0 ? (
+        <p className="text-center p-4">No meals found.</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="table w-full border border-gray-300">
+            <thead className="bg-gray-100">
               <tr>
-                <td colSpan="6" className="text-center p-4">
-                  No meals found.
-                </td>
+                <th className="p-2 text-left">Title</th>
+                <th className="p-2 text-left">Likes</th>
+                <th className="p-2 text-left">Reviews Count</th>
+                <th className="p-2 text-left">Rating</th>
+                <th className="p-2 text-left">Distributor</th>
+                <th className="p-2 text-left">Actions</th>
               </tr>
-            ) : (
-              meals.map((meal) => (
+            </thead>
+            <tbody>
+              {meals.map((meal) => (
                 <tr key={meal._id} className="hover:bg-gray-50">
                   <td className="p-2">{meal.title}</td>
                   <td className="p-2 flex items-center gap-1">
@@ -155,6 +145,7 @@ const AllMeals = () => {
                       onClick={() => handleDelete(meal._id)}
                       className="text-red-600 hover:underline"
                       title="Delete Meal"
+                      disabled={deleteMutation.isLoading}
                     >
                       <FaTrash />
                     </button>
@@ -167,16 +158,16 @@ const AllMeals = () => {
                     </button>
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Pagination */}
       <div className="mt-4 flex justify-center gap-2">
         <button
-          disabled={page <= 1}
+          disabled={page <= 1 || isLoading}
           onClick={() => setPage((p) => Math.max(p - 1, 1))}
           className="px-3 py-1 border rounded disabled:opacity-50"
         >
@@ -186,18 +177,17 @@ const AllMeals = () => {
           Page {page} / {totalPages}
         </span>
         <button
-          disabled={page >= totalPages}
+          disabled={page >= totalPages || isLoading}
           onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
           className="px-3 py-1 border rounded disabled:opacity-50"
         >
           Next
         </button>
       </div>
-      <MealDetailsModal
-        isOpen={isModalOpen}
+
+      <MealDetailsModal isOpen={isModalOpen}
         closeModal={() => setIsModalOpen(false)}
-        meal={selectedMeal}
-      />
+        meal={selectedMeal}></MealDetailsModal>
     </div>
   );
 };

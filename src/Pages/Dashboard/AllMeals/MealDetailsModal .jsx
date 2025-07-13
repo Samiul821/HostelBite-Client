@@ -71,7 +71,7 @@ const MealDetailsModal = ({ isOpen, closeModal, meal }) => {
                     <strong>Reviews:</strong> {meal?.reviews_count || 0}
                   </p>
                   <p>
-                    <strong>Rating:</strong> {meal?.rating || "N/A"}
+                    <strong>Rating:</strong> {meal?.rating ?? "N/A"}
                   </p>
                   <p>
                     <strong>Distributor:</strong>{" "}

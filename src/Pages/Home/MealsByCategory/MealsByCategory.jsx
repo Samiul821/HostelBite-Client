@@ -1,34 +1,39 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { FaStar } from "react-icons/fa";
 import useAxios from "../../../Hooks/useAxios";
 import MealCard from "./MealCard";
 import { useTheme } from "../../../Hooks/useTheme";
+import { useQuery } from "@tanstack/react-query";
 
 const MealsByCategory = () => {
-  const [meals, setMeals] = useState([]);
   const [activeTab, setActiveTab] = useState("All");
   const axios = useAxios();
   const { isDark } = useTheme();
 
   const categories = ["Breakfast", "Lunch", "Dinner", "All"];
 
-  // Fetch all meals once
-  useEffect(() => {
-    axios
-      .get("/meals")
-      .then((res) => setMeals(res.data))
-      .catch((err) => console.error("Fetch meals failed:", err));
-  }, [axios]);
+  // Fetch all meals using TanStack Query
+  const {
+    data: meals = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["meals"],
+    queryFn: async () => {
+      const res = await axios.get("/meals");
+      return res.data;
+    },
+  });
 
-  const filtered = activeTab === "All"
-    ? meals
-    : meals.filter((m) => m.category === activeTab);
+  const filtered =
+    activeTab === "All"
+      ? meals
+      : meals.filter((meal) => meal.category === activeTab);
 
   return (
     <section className="">
-      <h2 className="text-3xl font-bold text-center mb-8">
-        Meals by Category
-      </h2>
+      <h2 className="text-3xl font-bold text-center mb-8">Meals by Category</h2>
 
       {/* Tabs */}
       <div className="flex justify-center flex-wrap gap-4 mb-8">
@@ -49,17 +54,31 @@ const MealsByCategory = () => {
         ))}
       </div>
 
-      {/* Meals Grid */}
-      {filtered.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {filtered.slice(0, 4).map((meal) => (
-            <MealCard key={meal._id} meal={meal} />
-          ))}
-        </div>
-      ) : (
-        <p className="text-center text-gray-500 dark:text-gray-400 mt-10">
-          No meals found in this category.
+      {/* Loading & Error */}
+      {isLoading && (
+        <p className="text-center text-lg mt-10">Loading meals...</p>
+      )}
+      {isError && (
+        <p className="text-center text-red-500 mt-10">
+          Error: {error?.message || "Failed to fetch meals."}
         </p>
+      )}
+
+      {/* Meals Grid */}
+      {!isLoading && !isError && (
+        <>
+          {filtered.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {filtered.slice(0, 4).map((meal) => (
+                <MealCard key={meal._id} meal={meal} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-gray-500 dark:text-gray-400 mt-10">
+              No meals found in this category.
+            </p>
+          )}
+        </>
       )}
     </section>
   );

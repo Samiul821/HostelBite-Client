@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
 import useAuth from "../../Hooks/useAuth";
 import toast from "react-hot-toast";
@@ -14,72 +15,68 @@ const MealDetails = () => {
   const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
   const { isDark } = useTheme();
+  const queryClient = useQueryClient();
 
-  const [meal, setMeal] = useState(null);
-  const [refresh, setRefresh] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [userPackage, setUserPackage] = useState(null);
   const [requested, setRequested] = useState(false);
 
-  // Fetch Meal
-  useEffect(() => {
-    axiosSecure
-      .get(`/meals/${id}`)
-      .then((res) => {
-        setMeal(res.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        toast.error("Failed to load meal");
-        setLoading(false);
+  // Fetch meal details with React Query
+  const {
+    data: meal,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["meal", id],
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/meals/${id}`);
+      return res.data;
+    },
+    refetchOnWindowFocus: false,
+  });
+
+  const { data: userPackage } = useQuery({
+    queryKey: ["userPackage", user?.email],
+    queryFn: async () => {
+      if (!user?.email) return null;
+      const res = await axiosSecure.get(`/user/package?email=${user.email}`);
+      return res.data.badge;
+    },
+    enabled: !!user?.email,
+    refetchOnWindowFocus: false,
+  });
+
+  // Like meal mutation
+  const likeMutation = useMutation({
+    mutationFn: () => axiosSecure.patch(`/meals/${id}/like`),
+    onSuccess: () => {
+      toast.success("Thanks for your like!");
+      queryClient.invalidateQueries(["meal", id]);
+    },
+    onError: () => {
+      toast.error("Failed to like");
+    },
+  });
+
+  const requestMutation = useMutation({
+    mutationFn: () => {
+      if (!user) throw new Error("Login required");
+      return axiosSecure.post("/meal-requests", {
+        userEmail: user.email,
+        mealId: id,
+        status: "pending",
+        requestedAt: new Date(),
       });
-  }, [id, refresh, axiosSecure]);
+    },
+    onSuccess: () => {
+      toast.success("Meal requested!");
+      setRequested(true);
+    },
+    onError: () => {
+      toast.error("Request failed");
+    },
+  });
 
-  // Fetch user package
-  useEffect(() => {
-    if (user?.email) {
-      axiosSecure
-        .get(`/user/package?email=${user.email}`)
-        .then((res) => setUserPackage(res.data.badge))
-        .catch((err) => console.error(err));
-    }
-  }, [user, axiosSecure]);
-
-  // Like Handler
-  const handleLike = () => {
-    if (!user) return toast.error("Login required to like");
-    axiosSecure
-      .patch(`/meals/${id}/like`)
-      .then(() => {
-        toast.success("Thanks for your like!");
-        setRefresh(!refresh);
-      })
-      .catch(() => toast.error("Failed to like"));
-  };
-
-  // Request Handler
-  const handleRequest = () => {
-    if (!user) return toast.error("Login required to request");
-
-    const requestData = {
-      userEmail: user.email,
-      mealId: id,
-      status: "pending",
-      requestedAt: new Date(),
-    };
-
-    axiosSecure
-      .post("/meal-requests", requestData)
-      .then(() => {
-        toast.success("Meal requested!");
-        setRequested(true); // <-- একবার রিকোয়েস্ট সফল হলে true করে দিবে
-      })
-      .catch(() => toast.error("Request failed"));
-  };
-
-  if (loading) return <p className="text-center">Loading...</p>;
-  if (!meal) return <p className="text-center">Meal not found.</p>;
+  if (isLoading) return <p className="text-center">Loading...</p>;
+  if (isError || !meal) return <p className="text-center">Meal not found.</p>;
 
   return (
     <motion.div
@@ -97,7 +94,8 @@ const MealDetails = () => {
           className="rounded-lg w-full h-80 object-cover"
         />
         <button
-          onClick={handleLike}
+          onClick={() => likeMutation.mutate()}
+          disabled={likeMutation.isLoading}
           className={`absolute top-4 right-4 p-2 rounded-full shadow ${
             isDark ? "bg-gray-800" : "bg-white"
           }`}
@@ -138,8 +136,8 @@ const MealDetails = () => {
         </div>
 
         <button
-          onClick={handleRequest}
-          disabled={!userPackage || requested} // requested true হলে disabled হবে
+          onClick={() => requestMutation.mutate()}
+          disabled={!userPackage || requested || requestMutation.isLoading}
           className={`btn btn-sm mt-3 ${
             userPackage && !requested
               ? "btn-primary"
@@ -150,6 +148,8 @@ const MealDetails = () => {
             ? "Subscription Required"
             : requested
             ? "Request Sent"
+            : requestMutation.isLoading
+            ? "Requesting..."
             : "Request Meal"}
         </button>
 
@@ -165,7 +165,10 @@ const MealDetails = () => {
         <h3 className="text-2xl font-semibold mb-4">
           Reviews ({meal.reviews_count})
         </h3>
-        <ReviewForm mealId={id} onReviewSubmit={() => setRefresh(!refresh)} />
+        <ReviewForm
+          mealId={id}
+          onReviewSubmit={() => queryClient.invalidateQueries(["meal", id])}
+        />
         <ReviewList mealId={id} />
       </div>
     </motion.div>

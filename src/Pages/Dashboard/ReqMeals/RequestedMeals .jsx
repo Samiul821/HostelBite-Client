@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import { FaHeart } from "react-icons/fa";
 import useAuth from "../../../Hooks/useAuth";
@@ -6,22 +7,29 @@ import { useTheme } from "../../../Hooks/useTheme";
 import Swal from "sweetalert2";
 
 const RequestedMeals = () => {
-  const [requestedMeals, setRequestedMeals] = useState([]);
   const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
   const { isDark } = useTheme();
-  console.log(requestedMeals);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (!user?.email) return;
-    axiosSecure.get(`/requested-meals?email=${user.email}`).then((res) => {
-      console.log("Requested Meals API response:", res.data);
-      setRequestedMeals(res.data);
-    });
-  }, [axiosSecure, user?.email]);
+  // ✅ Fetch requested meals using TanStack
+  const {
+    data: requestedMeals = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["requestedMeals", user?.email],
+    enabled: !!user?.email, // only run when email is available
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/requested-meals?email=${user.email}`);
+      return res.data;
+    },
+  });
 
-  const handleCancel = (id) => {
-    Swal.fire({
+  // ✅ Cancel requested meal
+  const handleCancel = async (id) => {
+    const confirm = await Swal.fire({
       title: "Are you sure?",
       text: "You want to cancel this requested meal!",
       icon: "warning",
@@ -29,27 +37,44 @@ const RequestedMeals = () => {
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
       confirmButtonText: "Yes, cancel it!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        axiosSecure.delete(`/requested-meals/${id}`).then((res) => {
-          if (res.data.deletedCount > 0) {
-            setRequestedMeals((prev) => prev.filter((meal) => meal._id !== id));
-            Swal.fire(
-              "Cancelled!",
-              "Your requested meal has been cancelled.",
-              "success"
-            );
-          } else {
-            Swal.fire(
-              "Error!",
-              "Failed to cancel the requested meal.",
-              "error"
-            );
-          }
-        });
-      }
     });
+
+    if (confirm.isConfirmed) {
+      try {
+        const res = await axiosSecure.delete(`/requested-meals/${id}`);
+        if (res.data.deletedCount > 0) {
+          Swal.fire(
+            "Cancelled!",
+            "Your requested meal has been cancelled.",
+            "success"
+          );
+          queryClient.invalidateQueries({
+            queryKey: ["requestedMeals", user?.email],
+          });
+        } else {
+          Swal.fire("Error!", "Failed to cancel the requested meal.", "error");
+        }
+      } catch (error) {
+        console.error(error);
+        Swal.fire("Error!", "Something went wrong.", "error");
+      }
+    }
   };
+
+  // ✅ UI States
+  if (isLoading) {
+    return (
+      <p className="text-center mt-10 text-lg">Loading requested meals...</p>
+    );
+  }
+
+  if (isError) {
+    return (
+      <p className="text-center text-red-500 mt-10">
+        Error: {error.message || "Something went wrong."}
+      </p>
+    );
+  }
 
   return (
     <div
@@ -76,44 +101,48 @@ const RequestedMeals = () => {
             </tr>
           </thead>
           <tbody>
-            {requestedMeals.map((meal) => (
-              <tr
-                key={meal._id}
-                className={`hover:${isDark ? "bg-gray-700" : "bg-gray-50"}`}
-              >
-                <td className="p-3">{meal.mealDetails?.title || "No title"}</td>
-                <td className="p-3 flex items-center gap-1">
-                  <FaHeart className="text-red-500" />{" "}
-                  {meal.mealDetails?.likes || 0}
-                </td>
-                <td className="p-3">{meal.mealDetails?.reviews_count || 0}</td>
-                <td className="p-3">
-                  <span
-                    className={`px-2 py-1 rounded text-xs font-medium ${
-                      meal.status === "pending"
-                        ? "bg-yellow-100 text-yellow-600"
-                        : meal.status === "approved"
-                        ? "bg-green-100 text-green-600"
-                        : "bg-gray-200 text-gray-700"
-                    }`}
-                  >
-                    {meal.status}
-                  </span>
-                </td>
-                <td className="p-3">
-                  <button
-                    onClick={() => handleCancel(meal._id)}
-                    className={`hover:underline ${
-                      isDark ? "text-red-400" : "text-red-600"
-                    }`}
-                  >
-                    Cancel
-                  </button>
-                </td>
-              </tr>
-            ))}
-
-            {requestedMeals.length === 0 && (
+            {requestedMeals.length > 0 ? (
+              requestedMeals.map((meal) => (
+                <tr
+                  key={meal._id}
+                  className={`hover:${isDark ? "bg-gray-700" : "bg-gray-50"}`}
+                >
+                  <td className="p-3">
+                    {meal.mealDetails?.title || "No title"}
+                  </td>
+                  <td className="p-3 flex items-center gap-1">
+                    <FaHeart className="text-red-500" />{" "}
+                    {meal.mealDetails?.likes || 0}
+                  </td>
+                  <td className="p-3">
+                    {meal.mealDetails?.reviews_count || 0}
+                  </td>
+                  <td className="p-3">
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-medium ${
+                        meal.status === "pending"
+                          ? "bg-yellow-100 text-yellow-600"
+                          : meal.status === "approved"
+                          ? "bg-green-100 text-green-600"
+                          : "bg-gray-200 text-gray-700"
+                      }`}
+                    >
+                      {meal.status}
+                    </span>
+                  </td>
+                  <td className="p-3">
+                    <button
+                      onClick={() => handleCancel(meal._id)}
+                      className={`hover:underline ${
+                        isDark ? "text-red-400" : "text-red-600"
+                      }`}
+                    >
+                      Cancel
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
               <tr>
                 <td
                   colSpan="5"

@@ -1,31 +1,46 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import useAuth from "../../../Hooks/useAuth";
 import { useTheme } from "../../../Hooks/useTheme";
+import { useQuery } from "@tanstack/react-query";
 
 const PayHistory = () => {
-  const [payments, setPayments] = useState([]);
   const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
   const { isDark } = useTheme();
 
-  useEffect(() => {
-    if (!user?.email) return;
-    axiosSecure
-      .get(`/payments?email=${user.email}`)
-      .then((res) => setPayments(res.data))
-      .catch(console.error);
-  }, [user?.email, axiosSecure]);
+  // ✅ TanStack Query for payment history
+  const {
+    data: payments = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["payments", user?.email],
+    enabled: !!user?.email,
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/payments?email=${user.email}`);
+      return res.data;
+    },
+  });
 
   return (
     <div
-      className={`p-4 min-h-screen ${
-        isDark ? "text-white bg-gray-900" : "text-gray-800 bg-white"
-      }`}
+      className={`p-4 min-h-screen ${isDark ? "text-white" : "text-gray-800 "}`}
     >
       <h2 className="text-3xl font-bold mb-6 text-center">Payment History</h2>
 
-      {payments.length === 0 ? (
+      {isLoading && (
+        <p className="text-center text-lg text-gray-500">Loading payments...</p>
+      )}
+
+      {isError && (
+        <p className="text-center text-red-500">
+          Error: {error?.message || "Failed to load payment history."}
+        </p>
+      )}
+
+      {!isLoading && payments.length === 0 ? (
         <p className="text-center text-gray-400">No payment history found.</p>
       ) : (
         <div className="overflow-x-auto shadow-md rounded-lg">
