@@ -22,6 +22,7 @@ import ManageUsers from "../Pages/Dashboard/ManageUsers/ManageUsers";
 import AllMeals from "../Pages/Dashboard/AllMeals/AllMeals";
 import UpdateMeal from "../Pages/Dashboard/AllMeals/UpdateMeal";
 import AllReviews from "../Pages/Dashboard/AllReviews/AllReviews";
+import ServeMeals from "../Pages/Dashboard/ServeMeals/ServeMeals";
 
 const router = createBrowserRouter([
   {
@@ -136,6 +137,14 @@ const router = createBrowserRouter([
         element: (
           <AdminRoute>
             <AllReviews></AllReviews>
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "serve-meals",
+        element: (
+          <AdminRoute>
+            <ServeMeals></ServeMeals>
           </AdminRoute>
         ),
       },
