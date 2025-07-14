@@ -38,7 +38,7 @@ const AllMeals = () => {
   // Delete meal mutation
   const deleteMutation = useMutation({
     mutationFn: (id) => axiosSecure.delete(`/meals/${id}`),
-    onSuccess: (_, id) => {
+    onSuccess: (_id, id) => {
       Swal.fire("Deleted!", "Meal has been deleted.", "success");
       // Refetch meals after delete
       queryClient.invalidateQueries(["all-meals"]);
