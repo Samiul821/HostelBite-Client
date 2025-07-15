@@ -25,6 +25,7 @@ import AllReviews from "../Pages/Dashboard/AllReviews/AllReviews";
 import ServeMeals from "../Pages/Dashboard/ServeMeals/ServeMeals";
 import UpcomingMeals from "../Pages/Dashboard/UpcomingMeals/UpcomingMeals";
 import AddMealPage from "../Pages/Dashboard/UpcomingMeals/AddMealPage";
+import AdminProfile from "../Pages/Dashboard/AdminProfile/AdminProfile";
 
 const router = createBrowserRouter([
   {
@@ -163,6 +164,14 @@ const router = createBrowserRouter([
         element: (
           <AdminRoute>
             <AddMealPage></AddMealPage>
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "admin-profile",
+        element: (
+          <AdminRoute>
+            <AdminProfile></AdminProfile>
           </AdminRoute>
         ),
       },
