@@ -1,7 +1,8 @@
 import React from "react";
+import AdminHome from "./AdminHome/AdminHome";
 
 const DashboardHome = () => {
-  return <div className="text-xl font-semibold">Welcome to Dashboard!</div>;
+  return <AdminHome></AdminHome>;
 };
 
 export default DashboardHome;
