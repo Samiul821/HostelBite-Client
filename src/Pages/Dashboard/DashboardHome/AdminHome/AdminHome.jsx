@@ -1,6 +1,7 @@
 import React from "react";
 import StatisticsCards from "./StatisticsCards ";
 import ChartSection from "./ChartSection";
+import RecentMealRequests from "./RecentMealRequests";
 
 const AdminHome = () => {
   return (
@@ -8,6 +9,7 @@ const AdminHome = () => {
       <h2 className="text-3xl font-bold mb-6 text-center">Admin Dashboard</h2>
       <StatisticsCards />
       <ChartSection></ChartSection>
+      <RecentMealRequests />
     </div>
   );
 };

@@ -13,13 +13,13 @@ import {
 } from "recharts";
 import { useQuery } from "@tanstack/react-query";
 import useAxiosSecure from "../../../../Hooks/useAxiosSecure";
-import { useTheme } from "../../../../Hooks/useTheme";
+// import { useTheme } from "../../../../Hooks/useTheme";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const ChartSection = () => {
   const axiosSecure = useAxiosSecure();
-  const { isDark } = useTheme();
+//   const { isDark } = useTheme();
 
   const { data: stats = {}, isLoading } = useQuery({
     queryKey: ["dashboard-stats"],
