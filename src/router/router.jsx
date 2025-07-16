@@ -26,6 +26,7 @@ import ServeMeals from "../Pages/Dashboard/ServeMeals/ServeMeals";
 import UpcomingMeals from "../Pages/Dashboard/UpcomingMeals/UpcomingMeals";
 import AddMealPage from "../Pages/Dashboard/UpcomingMeals/AddMealPage";
 import AdminProfile from "../Pages/Dashboard/AdminProfile/AdminProfile";
+import UserRoute from "../routes/UserRoute";
 
 const router = createBrowserRouter([
   {
@@ -87,19 +88,31 @@ const router = createBrowserRouter([
       // User Route
       {
         path: "req-meals",
-        element: <RequestedMeals></RequestedMeals>,
+        element: (
+          <UserRoute>
+            <RequestedMeals></RequestedMeals>
+          </UserRoute>
+        ),
       },
       {
         path: "my-reviews",
-        element: <MyReviews></MyReviews>,
+        element: (
+          <UserRoute>
+            <MyReviews></MyReviews>
+          </UserRoute>
+        ),
       },
       {
         path: "pay-history",
-        element: <PayHistory></PayHistory>,
+        element: (
+          <UserRoute>
+            <PayHistory></PayHistory>
+          </UserRoute>
+        ),
       },
       {
         path: "my-profile",
-        element: <MyProfile></MyProfile>,
+        element: <UserRoute></UserRoute>,
       },
 
       // Adimin route
