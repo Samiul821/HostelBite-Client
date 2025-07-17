@@ -6,12 +6,15 @@ import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import MealDetailsModal from "./MealDetailsModal ";
 
+import { useTheme } from "../../../Hooks/useTheme";
+
 const AllMeals = () => {
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState("");
   const [order, setOrder] = useState("desc");
   const limit = 10;
 
+  const { isDark } = useTheme();
   const axiosSecure = useAxiosSecure();
   const queryClient = useQueryClient();
 
@@ -80,27 +83,41 @@ const AllMeals = () => {
   const totalPages = Math.ceil(totalMeals / limit);
 
   return (
-    <div className="p-4">
+    <div className={`p-4 ${isDark ? " text-white" : " text-gray-900"}`}>
       <h2 className="text-2xl font-semibold mb-4">All Meals</h2>
 
       <div className="mb-4 flex gap-4">
         <button
           onClick={() => handleSortChange("likes")}
           className={`px-4 py-2 rounded border ${
-            sortBy === "likes" ? "bg-blue-600 text-white" : "bg-gray-200"
+            sortBy === "likes"
+              ? isDark
+                ? "bg-blue-700 text-white"
+                : "bg-blue-600 text-white"
+              : isDark
+              ? "bg-gray-700 text-gray-300"
+              : "bg-gray-200 text-gray-700"
           }`}
           disabled={isLoading}
         >
-          Sort by Likes {sortBy === "likes" ? (order === "asc" ? "↑" : "↓") : ""}
+          Sort by Likes{" "}
+          {sortBy === "likes" ? (order === "asc" ? "↑" : "↓") : ""}
         </button>
         <button
           onClick={() => handleSortChange("reviews_count")}
           className={`px-4 py-2 rounded border ${
-            sortBy === "reviews_count" ? "bg-blue-600 text-white" : "bg-gray-200"
+            sortBy === "reviews_count"
+              ? isDark
+                ? "bg-blue-700 text-white"
+                : "bg-blue-600 text-white"
+              : isDark
+              ? "bg-gray-700 text-gray-300"
+              : "bg-gray-200 text-gray-700"
           }`}
           disabled={isLoading}
         >
-          Sort by Reviews {sortBy === "reviews_count" ? (order === "asc" ? "↑" : "↓") : ""}
+          Sort by Reviews{" "}
+          {sortBy === "reviews_count" ? (order === "asc" ? "↑" : "↓") : ""}
         </button>
       </div>
 
@@ -112,8 +129,16 @@ const AllMeals = () => {
         <p className="text-center p-4">No meals found.</p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="table w-full border border-gray-300">
-            <thead className="bg-gray-100">
+          <table
+            className={`table w-full border ${
+              isDark ? "border-gray-600" : "border-gray-300"
+            }`}
+          >
+            <thead
+              className={
+                isDark ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-900"
+              }
+            >
               <tr>
                 <th className="p-2 text-left">Title</th>
                 <th className="p-2 text-left">Likes</th>
@@ -123,9 +148,16 @@ const AllMeals = () => {
                 <th className="p-2 text-left">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody
+              className={
+                isDark ? "bg-gray-700 text-gray-200" : "bg-white text-gray-900"
+              }
+            >
               {meals.map((meal) => (
-                <tr key={meal._id} className="hover:bg-gray-50">
+                <tr
+                  key={meal._id}
+                  className={isDark ? "hover:bg-gray-600" : "hover:bg-gray-50"}
+                >
                   <td className="p-2">{meal.title}</td>
                   <td className="p-2 flex items-center gap-1">
                     <FaHeart className="text-red-500" /> {meal.likes || 0}
@@ -136,7 +168,9 @@ const AllMeals = () => {
                   <td className="p-2 flex gap-3">
                     <Link
                       to={`/dashboard/update-meal/${meal._id}`}
-                      className="text-blue-600 hover:underline"
+                      className={`${
+                        isDark ? "text-blue-400" : "text-blue-600"
+                      } hover:underline`}
                       title="Update Meal"
                     >
                       <FaEdit />
@@ -151,7 +185,9 @@ const AllMeals = () => {
                     </button>
                     <button
                       onClick={() => handleViewMeal(meal)}
-                      className="text-green-600 hover:underline"
+                      className={`${
+                        isDark ? "text-green-400" : "text-green-600"
+                      } hover:underline`}
                       title="View Meal"
                     >
                       <FaEye />
@@ -169,25 +205,41 @@ const AllMeals = () => {
         <button
           disabled={page <= 1 || isLoading}
           onClick={() => setPage((p) => Math.max(p - 1, 1))}
-          className="px-3 py-1 border rounded disabled:opacity-50"
+          className={`px-3 py-1 border rounded disabled:opacity-50 ${
+            isDark
+              ? "border-gray-600 text-gray-300"
+              : "border-gray-300 text-gray-700"
+          }`}
         >
           Prev
         </button>
-        <span className="px-3 py-1 border rounded">
+        <span
+          className={`px-3 py-1 border rounded ${
+            isDark
+              ? "border-gray-600 text-gray-300"
+              : "border-gray-300 text-gray-700"
+          }`}
+        >
           Page {page} / {totalPages}
         </span>
         <button
           disabled={page >= totalPages || isLoading}
           onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-          className="px-3 py-1 border rounded disabled:opacity-50"
+          className={`px-3 py-1 border rounded disabled:opacity-50 ${
+            isDark
+              ? "border-gray-600 text-gray-300"
+              : "border-gray-300 text-gray-700"
+          }`}
         >
           Next
         </button>
       </div>
 
-      <MealDetailsModal isOpen={isModalOpen}
+      <MealDetailsModal
+        isOpen={isModalOpen}
         closeModal={() => setIsModalOpen(false)}
-        meal={selectedMeal}></MealDetailsModal>
+        meal={selectedMeal}
+      />
     </div>
   );
 };

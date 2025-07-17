@@ -10,6 +10,8 @@ const ManageUsers = () => {
   const axiosSecure = useAxiosSecure();
   const { isDark } = useTheme();
   const queryClient = useQueryClient();
+  const [page, setPage] = useState(1);
+  const limit = 10;
 
   // Fetch users with search param
   const {
