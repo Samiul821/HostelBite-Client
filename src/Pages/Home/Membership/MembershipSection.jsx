@@ -23,10 +23,10 @@ const MembershipSection = () => {
 
   return (
     <section>
-      <div className=" text-center">
+      <div className="text-center">
         <h2
           className={`text-3xl md:text-4xl font-bold mb-4 ${
-            isDark ? "text-indigo-400" : ""
+            isDark ? "text-indigo-400" : "text-gray-900"
           }`}
         >
           Upgrade Your Meal Experience
@@ -40,7 +40,6 @@ const MembershipSection = () => {
           priority service.
         </p>
 
-        {/* Loading & Error States */}
         {isLoading && (
           <p className="text-lg text-center mt-6 text-indigo-500">
             Loading packages...
@@ -52,12 +51,11 @@ const MembershipSection = () => {
           </p>
         )}
 
-        {/* Packages Grid */}
         {!isLoading && !isError && (
           <div className="grid gap-8 md:grid-cols-3">
             {packages.map((pkg, idx) => (
               <motion.div
-                key={pkg.name}
+                key={pkg._id}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: idx * 0.2 }}
@@ -69,7 +67,7 @@ const MembershipSection = () => {
                   }
                 `}
               >
-                <h3 className="text-xl font-semibold mb-2">
+                <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
                   {pkg.name} Package
                 </h3>
                 <p className="text-3xl font-bold mb-4 text-indigo-600">

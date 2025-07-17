@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
@@ -18,13 +17,25 @@ const MealDetails = () => {
   const { isDark } = useTheme();
   const queryClient = useQueryClient();
 
-  const [requested, setRequested] = useState(false);
+  // Check if user already requested this meal
+  const { data: hasRequested = false, isLoading: loadingRequestStatus } =
+    useQuery({
+      queryKey: ["mealRequested", user?.email, id],
+      enabled: !!user?.email && !!id,
+      queryFn: async () => {
+        const res = await axiosSecure.get(
+          `/meal-request-status?email=${user.email}&mealId=${id}`
+        );
+        return res.data.requested;
+      },
+      refetchOnWindowFocus: false,
+    });
 
-  // Fetch meal details with React Query
+  // Fetch meal details
   const {
     data: meal,
-    isLoading,
-    isError,
+    isLoading: loadingMeal,
+    isError: mealError,
   } = useQuery({
     queryKey: ["meal", id],
     queryFn: async () => {
@@ -34,18 +45,27 @@ const MealDetails = () => {
     refetchOnWindowFocus: false,
   });
 
-  const { data: userPackage } = useQuery({
+  // Fetch user badge (package)
+  const { data: userPackage, isLoading: loadingPackage } = useQuery({
     queryKey: ["userPackage", user?.email],
+    enabled: !!user?.email,
     queryFn: async () => {
       if (!user?.email) return null;
       const res = await axiosSecure.get(`/user/package?email=${user.email}`);
+      console.log("User Package (badge):", res.data.badge);
       return res.data.badge;
     },
-    enabled: !!user?.email,
     refetchOnWindowFocus: false,
   });
 
-  // Like meal mutation
+  // Helper to check if user has a valid paid package (badge other than Bronze)
+  const hasValidPackage =
+    !!userPackage &&
+    userPackage !== "Bronze" &&
+    userPackage !== "null" &&
+    userPackage !== "";
+
+  // Like mutation
   const likeMutation = useMutation({
     mutationFn: () => axiosSecure.patch(`/meals/${id}/like`),
     onSuccess: () => {
@@ -57,9 +77,13 @@ const MealDetails = () => {
     },
   });
 
+  // Request meal mutation
   const requestMutation = useMutation({
     mutationFn: () => {
       if (!user) throw new Error("Login required");
+      if (!hasValidPackage) throw new Error("Subscription required");
+      if (hasRequested) throw new Error("You have already requested this meal");
+
       return axiosSecure.post("/meal-requests", {
         userEmail: user.email,
         mealId: id,
@@ -69,15 +93,17 @@ const MealDetails = () => {
     },
     onSuccess: () => {
       toast.success("Meal requested!");
-      setRequested(true);
+      queryClient.invalidateQueries(["meal", id]);
+      queryClient.invalidateQueries(["mealRequested", user?.email, id]);
     },
-    onError: () => {
-      toast.error("Request failed");
+    onError: (error) => {
+      toast.error(error.message || "Request failed");
     },
   });
 
-  if (isLoading) return <LoadingSpinner />
-  if (isError || !meal) return <p className="text-center">Meal not found.</p>;
+  if (loadingMeal || loadingPackage || loadingRequestStatus)
+    return <LoadingSpinner />;
+  if (mealError || !meal) return <p className="text-center">Meal not found.</p>;
 
   return (
     <motion.div
@@ -138,23 +164,25 @@ const MealDetails = () => {
 
         <button
           onClick={() => requestMutation.mutate()}
-          disabled={!userPackage || requested || requestMutation.isLoading}
+          disabled={
+            !hasValidPackage || hasRequested || requestMutation.isLoading
+          }
           className={`btn btn-sm mt-3 ${
-            userPackage && !requested
+            hasValidPackage && !hasRequested
               ? "btn-primary"
               : "btn-disabled opacity-60 cursor-not-allowed"
           }`}
         >
-          {!userPackage
+          {!hasValidPackage
             ? "Subscription Required"
-            : requested
+            : hasRequested
             ? "Request Sent"
             : requestMutation.isLoading
             ? "Requesting..."
             : "Request Meal"}
         </button>
 
-        {!userPackage && (
+        {!hasValidPackage && (
           <p className="text-xs text-red-400 mt-1">
             * You need a membership to request this meal.
           </p>
