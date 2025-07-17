@@ -8,6 +8,8 @@ import MealModal from "./MealModal";
 import EditReviewModal from "./EditReviewModal";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
+const ITEMS_PER_PAGE = 10;
+
 const MyReviews = () => {
   const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
@@ -18,8 +20,8 @@ const MyReviews = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingReview, setEditingReview] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  // ✅ Fetch reviews using TanStack Query
   const {
     data: reviews = [],
     isLoading,
@@ -75,34 +77,39 @@ const MyReviews = () => {
         const res = await axiosSecure.delete(`/reviews/${id}`);
         if (res.data?.deletedCount > 0) {
           Swal.fire("Deleted!", "Your review has been deleted.", "success");
-          queryClient.invalidateQueries({
-            queryKey: ["myReviews", user?.email],
-          });
+          queryClient.invalidateQueries(["myReviews", user?.email]);
         } else {
           Swal.fire("Failed!", "Review not found or already deleted.", "error");
         }
       } catch (err) {
-        console.error(err);
         Swal.fire("Error!", "Something went wrong!", "error");
       }
     }
   };
 
   const handleReviewUpdate = () => {
-    queryClient.invalidateQueries({ queryKey: ["myReviews", user?.email] });
+    queryClient.invalidateQueries(["myReviews", user?.email]);
   };
 
-  if (isLoading) {
-    return <p className="text-center mt-10 text-lg">Loading your reviews...</p>;
-  }
+  // Pagination
+  const totalPages = Math.ceil(reviews.length / ITEMS_PER_PAGE);
+  const paginatedReviews = reviews.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
-  if (isError) {
+  const changePage = (page) => {
+    setCurrentPage(page);
+  };
+
+  if (isLoading)
+    return <p className="text-center mt-10 text-lg">Loading your reviews...</p>;
+  if (isError)
     return (
       <p className="text-center mt-10 text-red-500">
         Error: {error.message || "Failed to load reviews"}
       </p>
     );
-  }
 
   return (
     <div
@@ -131,8 +138,8 @@ const MyReviews = () => {
             </tr>
           </thead>
           <tbody>
-            {reviews.length > 0 ? (
-              reviews.map((review) => (
+            {paginatedReviews.length > 0 ? (
+              paginatedReviews.map((review) => (
                 <tr
                   key={review._id}
                   className={`transition-all duration-200 hover:scale-[1.01] hover:shadow-lg ${
@@ -183,16 +190,35 @@ const MyReviews = () => {
             )}
           </tbody>
         </table>
+
+        {/* Pagination Buttons */}
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-6 gap-2">
+            {[...Array(totalPages).keys()].map((num) => (
+              <button
+                key={num}
+                onClick={() => changePage(num + 1)}
+                className={`px-3 py-1 rounded-md border text-sm ${
+                  currentPage === num + 1
+                    ? "bg-green-600 text-white"
+                    : isDark
+                    ? "bg-gray-800 text-gray-300 border-gray-600"
+                    : "bg-white text-gray-700 border-gray-300"
+                }`}
+              >
+                {num + 1}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Meal View Modal */}
+      {/* Modals */}
       <MealModal
         isOpen={modalOpen}
         closeModal={closeModal}
         meal={selectedMeal}
       />
-
-      {/* Edit Review Modal */}
       <EditReviewModal
         isOpen={editModalOpen}
         reviewData={editingReview}
