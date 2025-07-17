@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
 import { useTheme } from "../../Hooks/useTheme";
@@ -5,6 +6,7 @@ import { useTheme } from "../../Hooks/useTheme";
 const ReviewList = ({ mealId }) => {
   const axiosSecure = useAxiosSecure();
   const { isDark } = useTheme();
+  const [showAll, setShowAll] = useState(false); // 🔄 Toggle state
 
   const {
     data: reviews = [],
@@ -17,7 +19,7 @@ const ReviewList = ({ mealId }) => {
       const res = await axiosSecure.get(`/reviews/${mealId}`);
       return res.data;
     },
-    enabled: !!mealId, // mealId না থাকলে fetch হবে না
+    enabled: !!mealId,
     refetchOnWindowFocus: false,
   });
 
@@ -31,7 +33,7 @@ const ReviewList = ({ mealId }) => {
 
   if (isError) {
     return (
-      <p className={`text-sm text-red-500`}>
+      <p className="text-sm text-red-500">
         Error: {error.message || "Failed to load reviews"}
       </p>
     );
@@ -45,9 +47,11 @@ const ReviewList = ({ mealId }) => {
     );
   }
 
+  const visibleReviews = showAll ? reviews : reviews.slice(0, 1); // 🔄 Only 1 if not showAll
+
   return (
     <div className="space-y-4">
-      {reviews.map((r) => (
+      {visibleReviews.map((r) => (
         <div
           key={r._id}
           className={`p-4 border rounded-lg transition duration-200 ${
@@ -56,7 +60,6 @@ const ReviewList = ({ mealId }) => {
               : "bg-white border-gray-200 text-gray-800"
           }`}
         >
-          {/* User Info */}
           <div className="flex items-center gap-3 mb-2">
             <img
               src={r.userImage}
@@ -75,10 +78,21 @@ const ReviewList = ({ mealId }) => {
             </div>
           </div>
 
-          {/* Review Text */}
           <p className="text-sm leading-relaxed">{r.review}</p>
         </div>
       ))}
+
+      {/* 🔘 Show More / Show Less Button */}
+      {reviews.length > 1 && (
+        <div className="text-center mt-4">
+          <button
+            onClick={() => setShowAll(!showAll)}
+            className="btn btn-sm btn-outline"
+          >
+            {showAll ? "Show Less" : "Show More"}
+          </button>
+        </div>
+      )}
     </div>
   );
 };

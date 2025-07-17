@@ -9,6 +9,7 @@ import { useTheme } from "../../Hooks/useTheme";
 import { motion } from "framer-motion";
 import ReviewForm from "./ReviewForm";
 import ReviewList from "./ReviewList";
+import LoadingSpinner from "../Shared/LoadingSpinner/LoadingSpinner";
 
 const MealDetails = () => {
   const { id } = useParams();
@@ -75,7 +76,7 @@ const MealDetails = () => {
     },
   });
 
-  if (isLoading) return <p className="text-center">Loading...</p>;
+  if (isLoading) return <LoadingSpinner />
   if (isError || !meal) return <p className="text-center">Meal not found.</p>;
 
   return (

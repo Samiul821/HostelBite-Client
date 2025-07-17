@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
 import Swal from "sweetalert2";
 import useAuth from "../../Hooks/useAuth";
+import LoadingSpinner from "../Shared/LoadingSpinner/LoadingSpinner";
 
 const UpcommingMeals = () => {
   const axiosSecure = useAxiosSecure();
@@ -28,15 +29,25 @@ const UpcommingMeals = () => {
     refetchOnWindowFocus: false,
   });
 
-  // ✅ POST like
+  // Like mutation (with auto publish alert)
   const likeMutation = useMutation({
     mutationFn: async (mealId) => {
-      const res = await axiosSecure.post(`/upcoming-meals/like/${mealId}`);
+      const res = await axiosSecure.patch(`/upcoming-meals/like/${mealId}`, {
+        userEmail: user.email,
+      });
       return res.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries(["upcoming-meals"]);
-      Swal.fire("Liked!", "You liked this meal ❤️", "success");
+      if (data.published) {
+        Swal.fire(
+          "Published!",
+          "This meal got 10 likes and is now published!",
+          "success"
+        );
+      } else {
+        Swal.fire("Liked!", "You liked this meal ❤️", "success");
+      }
     },
     onError: (error) => {
       Swal.fire(
@@ -58,7 +69,15 @@ const UpcommingMeals = () => {
     likeMutation.mutate(meal._id);
   };
 
-  if (isLoading) return <p className="text-center py-10">Loading meals...</p>;
+  if (isLoading) return <LoadingSpinner />;
+
+  if (!meals || meals.length === 0) {
+    return (
+      <div className="text-center py-20 text-gray-500 text-xl font-medium">
+        No upcoming meals found 😔
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

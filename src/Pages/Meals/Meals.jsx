@@ -11,20 +11,22 @@ const Meals = () => {
   const [category, setCategory] = useState("All");
   const [priceRange, setPriceRange] = useState([0, 9999]);
 
-  // useMemo to avoid unnecessary new object on every render causing infinite loop
-  const filters = useMemo(() => ({
-    search,
-    category,
-    min: priceRange[0],
-    max: priceRange[1],
-  }), [search, category, priceRange]);
+  const filters = useMemo(
+    () => ({
+      search,
+      category,
+      min: priceRange[0],
+      max: priceRange[1],
+    }),
+    [search, category, priceRange]
+  );
 
   const { meals, setPage, hasMore } = useMeals(filters);
 
   const categories = ["All", "Breakfast", "Lunch", "Dinner"];
 
   return (
-    <section>
+    <section className={`${isDark ? " text-white" : " text-gray-900"} `}>
       <h2 className="text-3xl font-bold text-center mb-6">All Meals</h2>
 
       {/* Filters */}
@@ -34,16 +36,22 @@ const Meals = () => {
           placeholder="Search meals..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="input input-bordered w-full sm:w-1/3"
+          className={`input input-bordered w-full sm:w-1/3 ${
+            isDark ? "bg-gray-800 text-white" : ""
+          }`}
         />
 
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="select select-bordered"
+          className={`select select-bordered ${
+            isDark ? "bg-gray-800 text-white" : ""
+          }`}
         >
           {categories.map((cat) => (
-            <option key={cat} value={cat}>{cat}</option>
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
           ))}
         </select>
 
@@ -54,7 +62,9 @@ const Meals = () => {
             min={0}
             value={priceRange[0]}
             onChange={(e) => setPriceRange([+e.target.value, priceRange[1]])}
-            className="input input-sm input-bordered w-20"
+            className={`input input-sm input-bordered w-20 ${
+              isDark ? "bg-gray-800 text-white" : ""
+            }`}
           />
           <span className="text-sm">৳ Max:</span>
           <input
@@ -62,7 +72,9 @@ const Meals = () => {
             min={0}
             value={priceRange[1]}
             onChange={(e) => setPriceRange([priceRange[0], +e.target.value])}
-            className="input input-sm input-bordered w-20"
+            className={`input input-sm input-bordered w-20 ${
+              isDark ? "bg-gray-800 text-white" : ""
+            }`}
           />
         </div>
       </div>

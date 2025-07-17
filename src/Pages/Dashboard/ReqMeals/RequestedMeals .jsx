@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import { FaHeart } from "react-icons/fa";
@@ -6,13 +6,15 @@ import useAuth from "../../../Hooks/useAuth";
 import { useTheme } from "../../../Hooks/useTheme";
 import Swal from "sweetalert2";
 
+const ITEMS_PER_PAGE = 10;
+
 const RequestedMeals = () => {
   const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
   const { isDark } = useTheme();
   const queryClient = useQueryClient();
+  const [currentPage, setCurrentPage] = useState(1);
 
-  // ✅ Fetch requested meals using TanStack
   const {
     data: requestedMeals = [],
     isLoading,
@@ -20,14 +22,13 @@ const RequestedMeals = () => {
     error,
   } = useQuery({
     queryKey: ["requestedMeals", user?.email],
-    enabled: !!user?.email, // only run when email is available
+    enabled: !!user?.email,
     queryFn: async () => {
       const res = await axiosSecure.get(`/requested-meals?email=${user.email}`);
       return res.data;
     },
   });
 
-  // ✅ Cancel requested meal
   const handleCancel = async (id) => {
     const confirm = await Swal.fire({
       title: "Are you sure?",
@@ -48,33 +49,36 @@ const RequestedMeals = () => {
             "Your requested meal has been cancelled.",
             "success"
           );
-          queryClient.invalidateQueries({
-            queryKey: ["requestedMeals", user?.email],
-          });
+          queryClient.invalidateQueries(["requestedMeals", user?.email]);
         } else {
           Swal.fire("Error!", "Failed to cancel the requested meal.", "error");
         }
       } catch (error) {
-        console.error(error);
         Swal.fire("Error!", "Something went wrong.", "error");
       }
     }
   };
 
-  // ✅ UI States
-  if (isLoading) {
+  // Pagination logic
+  const totalPages = Math.ceil(requestedMeals.length / ITEMS_PER_PAGE);
+  const paginatedMeals = requestedMeals.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const changePage = (page) => {
+    setCurrentPage(page);
+  };
+
+  // UI
+  if (isLoading)
     return (
       <p className="text-center mt-10 text-lg">Loading requested meals...</p>
     );
-  }
-
-  if (isError) {
+  if (isError)
     return (
-      <p className="text-center text-red-500 mt-10">
-        Error: {error.message || "Something went wrong."}
-      </p>
+      <p className="text-center text-red-500 mt-10">Error: {error.message}</p>
     );
-  }
 
   return (
     <div
@@ -101,8 +105,8 @@ const RequestedMeals = () => {
             </tr>
           </thead>
           <tbody>
-            {requestedMeals.length > 0 ? (
-              requestedMeals.map((meal) => (
+            {paginatedMeals.length > 0 ? (
+              paginatedMeals.map((meal) => (
                 <tr
                   key={meal._id}
                   className={`hover:${isDark ? "bg-gray-700" : "bg-gray-50"}`}
@@ -156,6 +160,27 @@ const RequestedMeals = () => {
             )}
           </tbody>
         </table>
+
+        {/* ✅ Pagination Footer */}
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-6 gap-2">
+            {[...Array(totalPages).keys()].map((num) => (
+              <button
+                key={num}
+                onClick={() => changePage(num + 1)}
+                className={`px-3 py-1 rounded-md border text-sm ${
+                  currentPage === num + 1
+                    ? "bg-green-600 text-white"
+                    : isDark
+                    ? "bg-gray-800 text-gray-300 border-gray-600"
+                    : "bg-white text-gray-700 border-gray-300"
+                }`}
+              >
+                {num + 1}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

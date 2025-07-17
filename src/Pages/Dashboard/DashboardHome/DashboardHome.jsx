@@ -3,6 +3,7 @@ import AdminHome from "./AdminHome/AdminHome";
 import useUserRole from "../../../Hooks/useUserRole";
 import LoadingSpinner from "../../Shared/LoadingSpinner/LoadingSpinner";
 import UserHome from "./UserHome/UserHome";
+import Forbidden from "../../Shared/Forbidden/Forbidden";
 const DashboardHome = () => {
   const { role, roleLoading } = useUserRole();
 
@@ -14,7 +15,7 @@ const DashboardHome = () => {
   } else if (role === "admin") {
     return <AdminHome />;
   } else {
-    return <h2>Forbidden</h2>;
+    return <Forbidden />;
   }
 };
 

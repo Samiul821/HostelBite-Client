@@ -127,11 +127,18 @@ const UpcomingMeals = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <button
-                      disabled={publishMutation.isLoading}
+                      disabled={publishMutation.isLoading || meal.likes < 10}
+                      title={
+                        meal.likes < 10
+                          ? "Minimum 10 likes required to publish"
+                          : ""
+                      }
                       onClick={() => publishMutation.mutate(meal._id)}
                       className={`inline-flex items-center px-3 py-1 rounded-md text-white font-semibold transition ${
                         publishMutation.isLoading
                           ? "bg-gray-400 cursor-not-allowed"
+                          : meal.likes < 10
+                          ? "bg-gray-500 cursor-not-allowed"
                           : "bg-green-600 hover:bg-green-700"
                       }`}
                     >
