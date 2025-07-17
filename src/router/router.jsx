@@ -28,11 +28,14 @@ import AddMealPage from "../Pages/Dashboard/UpcomingMeals/AddMealPage";
 import AdminProfile from "../Pages/Dashboard/AdminProfile/AdminProfile";
 import UserRoute from "../routes/UserRoute";
 import UpcommingMeals from "../Pages/UpcomingMeals/UpcommingMeals";
+import ErrorPage from "../Pages/Shared/ErrorPage/ErrorPage";
+import Forbidden from "../Pages/Shared/Forbidden/Forbidden";
 
 const router = createBrowserRouter([
   {
     path: "/",
     Component: RootLayout,
+    errorElement: <ErrorPage></ErrorPage>,
     children: [
       {
         index: true,
@@ -41,6 +44,10 @@ const router = createBrowserRouter([
       {
         path: "/meals",
         Component: Meals,
+      },
+      {
+        path: "/forbidden",
+        Component: Forbidden,
       },
       {
         path: "/meals-details/:id",
@@ -117,7 +124,11 @@ const router = createBrowserRouter([
       },
       {
         path: "my-profile",
-        element: <UserRoute><MyProfile></MyProfile></UserRoute>,
+        element: (
+          <UserRoute>
+            <MyProfile></MyProfile>
+          </UserRoute>
+        ),
       },
 
       // Adimin route
