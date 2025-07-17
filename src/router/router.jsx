@@ -27,6 +27,7 @@ import UpcomingMeals from "../Pages/Dashboard/UpcomingMeals/UpcomingMeals";
 import AddMealPage from "../Pages/Dashboard/UpcomingMeals/AddMealPage";
 import AdminProfile from "../Pages/Dashboard/AdminProfile/AdminProfile";
 import UserRoute from "../routes/UserRoute";
+import UpcommingMeals from "../Pages/UpcomingMeals/UpcommingMeals";
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
             <MealDetails></MealDetails>
           </PrivateRoute>
         ),
+      },
+      {
+        path: "/upcoming",
+        element: <UpcommingMeals></UpcommingMeals>,
       },
       {
         path: "/checkout/:packageId",
@@ -112,7 +117,7 @@ const router = createBrowserRouter([
       },
       {
         path: "my-profile",
-        element: <UserRoute></UserRoute>,
+        element: <UserRoute><MyProfile></MyProfile></UserRoute>,
       },
 
       // Adimin route
