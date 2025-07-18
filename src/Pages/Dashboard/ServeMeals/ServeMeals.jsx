@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import { useTheme } from "../../../Hooks/useTheme";
 import toast from "react-hot-toast";
+import { Helmet } from "react-helmet-async";
 
 // Debounce function
 function debounce(func, delay) {
@@ -72,8 +73,16 @@ const ServeMeals = () => {
   });
 
   return (
-    <div className={`p-6 min-h-screen ${isDark ? "text-white" : "text-gray-800"}`}>
-      <h2 className="text-3xl font-bold mb-6 text-center">Serve Requested Meals</h2>
+    <div
+      className={`p-6 min-h-screen ${isDark ? "text-white" : "text-gray-800"}`}
+    >
+      <Helmet>
+        <title>HostelBite | Serve Meals</title>
+      </Helmet>
+
+      <h2 className="text-3xl font-bold mb-6 text-center">
+        Serve Requested Meals
+      </h2>
 
       {/* Search Bar */}
       <div className="flex justify-center mb-6">
@@ -89,7 +98,9 @@ const ServeMeals = () => {
       {/* Table */}
       <div className="overflow-x-auto shadow rounded-lg">
         <table className="table w-full">
-          <thead className={isDark ? "bg-gray-800 text-gray-300" : "bg-base-200"}>
+          <thead
+            className={isDark ? "bg-gray-800 text-gray-300" : "bg-base-200"}
+          >
             <tr>
               <th>Meal</th>
               <th>User Name</th>
@@ -120,7 +131,9 @@ const ServeMeals = () => {
                   <td>
                     <span
                       className={`badge ${
-                        req.status === "delivered" ? "badge-success" : "badge-warning"
+                        req.status === "delivered"
+                          ? "badge-success"
+                          : "badge-warning"
                       }`}
                     >
                       {req.status}
@@ -131,7 +144,9 @@ const ServeMeals = () => {
                       onClick={() => serveMeal(req._id)}
                       disabled={req.status === "delivered"}
                       className={`btn btn-sm ${
-                        req.status === "delivered" ? "btn-disabled" : "btn-primary"
+                        req.status === "delivered"
+                          ? "btn-disabled"
+                          : "btn-primary"
                       }`}
                     >
                       Serve

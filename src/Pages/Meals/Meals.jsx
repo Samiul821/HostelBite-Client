@@ -3,6 +3,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import useMeals from "../../Hooks/useMeals";
 import MealCard from "./MealCard";
 import { useTheme } from "../../Hooks/useTheme";
+import { Helmet } from "react-helmet-async";
 
 const Meals = () => {
   const { isDark } = useTheme();
@@ -27,6 +28,10 @@ const Meals = () => {
 
   return (
     <section className={`${isDark ? " text-white" : " text-gray-900"} `}>
+      <Helmet>
+        <title>All Meals - HostelBite</title>
+      </Helmet>
+
       <h2 className="text-3xl font-bold text-center mb-6">All Meals</h2>
 
       {/* Filters */}

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTheme } from "../../../Hooks/useTheme";
+import { Helmet } from "react-helmet-async";
 
 const ErrorPage = () => {
   const { isDark } = useTheme();
@@ -11,6 +12,10 @@ const ErrorPage = () => {
         isDark ? "bg-gray-900 text-white" : "bg-white text-gray-800"
       }`}
     >
+      <Helmet>
+        <title>HostelBite | Error 404</title>
+      </Helmet>
+
       <motion.img
         src="https://cdn.dribbble.com/users/285475/screenshots/2083086/dribbble_1.gif"
         alt="404 Illustration"

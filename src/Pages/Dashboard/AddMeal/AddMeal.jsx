@@ -5,6 +5,7 @@ import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useTheme } from "../../../Hooks/useTheme";
+import { Helmet } from "react-helmet-async";
 
 const imageHostingKey = import.meta.env.VITE_IMAGEBB_KEY;
 const imageUploadUrl = `https://api.imgbb.com/1/upload?key=${imageHostingKey}`;
@@ -84,6 +85,10 @@ const AddMeal = () => {
         isDark ? " text-white" : " text-gray-900"
       }`}
     >
+      <Helmet>
+        <title>Add Meal - HostelBite</title>
+      </Helmet>
+
       <div
         className={`max-w-3xl w-full mx-auto p-8 rounded-lg shadow-lg
       ${

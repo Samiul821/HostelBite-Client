@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import { FaEye, FaTrash } from "react-icons/fa";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import { useTheme } from "../../../Hooks/useTheme";
+import { Helmet } from "react-helmet-async";
 
 const AllReviews = () => {
   const axiosSecure = useAxiosSecure();
@@ -73,6 +74,10 @@ const AllReviews = () => {
         isDark ? "text-white" : "text-gray-800"
       }`}
     >
+      <Helmet>
+        <title>HostelBite | All Reviews</title>
+      </Helmet>
+
       <h2 className="text-3xl font-bold mb-6 text-center">All Reviews</h2>
 
       {reviewGroups.length === 0 ? (

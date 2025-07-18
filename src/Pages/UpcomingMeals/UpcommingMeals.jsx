@@ -3,6 +3,7 @@ import useAxiosSecure from "../../Hooks/useAxiosSecure";
 import Swal from "sweetalert2";
 import useAuth from "../../Hooks/useAuth";
 import LoadingSpinner from "../Shared/LoadingSpinner/LoadingSpinner";
+import { Helmet } from "react-helmet-async";
 
 const UpcommingMeals = () => {
   const axiosSecure = useAxiosSecure();
@@ -81,6 +82,10 @@ const UpcommingMeals = () => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <Helmet>
+        <title>Upcoming Meals - HostelBite</title>
+      </Helmet>
+
       {meals.map((meal) => (
         <div
           key={meal._id}

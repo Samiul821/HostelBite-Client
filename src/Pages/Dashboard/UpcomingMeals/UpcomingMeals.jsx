@@ -4,6 +4,7 @@ import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import { useTheme } from "../../../Hooks/useTheme";
 import Swal from "sweetalert2";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 
 const UpcomingMeals = () => {
   const axiosSecure = useAxiosSecure();
@@ -46,6 +47,10 @@ const UpcomingMeals = () => {
         isDark ? "bg-gray-900 text-white" : "bg-white text-gray-900"
       } max-w-7xl mx-auto`}
     >
+      <Helmet>
+        <title>HostelBite | Upcoming Meals</title>
+      </Helmet>
+
       <div className="flex flex-col md:flex-row justify-between items-center mb-6">
         <h1 className="text-3xl font-extrabold tracking-tight mb-4 md:mb-0">
           Upcoming Meals

@@ -10,6 +10,7 @@ import axios from "axios";
 import useAxios from "../../../Hooks/useAxios";
 import useAuth from "../../../Hooks/useAuth";
 import toast from "react-hot-toast";
+import { Helmet } from "react-helmet-async";
 
 const SignUp = () => {
   const { isDark } = useTheme();
@@ -162,6 +163,10 @@ const SignUp = () => {
           : "bg-gradient-to-br from-pink-100 via-purple-100 to-indigo-100"
       }`}
     >
+      <Helmet>
+        <title>HostelBite | Sign Up</title>
+      </Helmet>
+
       <motion.div
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}

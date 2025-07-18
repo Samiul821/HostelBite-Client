@@ -4,6 +4,7 @@ import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import { FaUserShield } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { useTheme } from "../../../Hooks/useTheme";
+import { Helmet } from "react-helmet-async";
 
 const ManageUsers = () => {
   const [search, setSearch] = useState("");
@@ -76,6 +77,10 @@ const ManageUsers = () => {
 
   return (
     <div className={`p-6 ${isDark ? "text-gray-200" : "text-gray-900"}`}>
+      <Helmet>
+        <title>HostelBite | Manage Users</title>
+      </Helmet>
+
       <h2 className="text-3xl font-bold mb-6 text-center">Manage Users</h2>
 
       <div className="mb-4 max-w-sm mx-auto">

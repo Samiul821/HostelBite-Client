@@ -5,6 +5,7 @@ import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import useAuth from "../../../Hooks/useAuth";
 import Swal from "sweetalert2";
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 
 const imageHostingKey = import.meta.env.VITE_IMAGEBB_KEY;
 const imageUploadUrl = `https://api.imgbb.com/1/upload?key=${imageHostingKey}`;
@@ -84,6 +85,10 @@ const UpdateMeal = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center">
+      <Helmet>
+        <title>HostelBite | Update Meal</title>
+      </Helmet>
+
       <div className="max-w-3xl w-full p-8 rounded-lg shadow-lg bg-gradient-to-r from-blue-50 via-white to-pink-50 text-gray-800">
         <h2 className="text-3xl font-bold mb-6 text-center">Update Meal</h2>
 

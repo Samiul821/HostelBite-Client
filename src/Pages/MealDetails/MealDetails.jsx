@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import ReviewForm from "./ReviewForm";
 import ReviewList from "./ReviewList";
 import LoadingSpinner from "../Shared/LoadingSpinner/LoadingSpinner";
+import { Helmet } from "react-helmet-async";
 
 const MealDetails = () => {
   const { id } = useParams();
@@ -113,6 +114,9 @@ const MealDetails = () => {
         isDark ? "bg-gray-900 text-white" : "bg-white text-gray-800"
       }`}
     >
+      <Helmet>
+        <title>{meal.title} - HostelBite</title>
+      </Helmet>
       {/* Meal Banner */}
       <div className="relative">
         <img

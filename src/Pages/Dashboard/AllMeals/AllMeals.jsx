@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import MealDetailsModal from "./MealDetailsModal ";
 
 import { useTheme } from "../../../Hooks/useTheme";
+import { Helmet } from "react-helmet-async";
 
 const AllMeals = () => {
   const [page, setPage] = useState(1);
@@ -84,6 +85,11 @@ const AllMeals = () => {
 
   return (
     <div className={`p-4 ${isDark ? " text-white" : " text-gray-900"}`}>
+   
+      <Helmet>
+        <title>HostelBite | All Meals</title>
+      </Helmet>
+
       <h2 className="text-2xl font-semibold mb-4">All Meals</h2>
 
       <div className="mb-4 flex gap-4">

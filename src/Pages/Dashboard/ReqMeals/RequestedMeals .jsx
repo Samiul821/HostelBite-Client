@@ -5,6 +5,7 @@ import { FaHeart } from "react-icons/fa";
 import useAuth from "../../../Hooks/useAuth";
 import { useTheme } from "../../../Hooks/useTheme";
 import Swal from "sweetalert2";
+import { Helmet } from "react-helmet-async";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -86,6 +87,10 @@ const RequestedMeals = () => {
         isDark ? "bg-gray-900 text-gray-100" : "bg-white text-gray-900"
       }`}
     >
+      <Helmet>
+        <title>HostelBite | Requested Meals</title>
+      </Helmet>
+
       <h2 className="text-2xl font-semibold mb-4">Requested Meals</h2>
       <div className="overflow-x-auto">
         <table

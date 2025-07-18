@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import { useTheme } from "../../../Hooks/useTheme";
 import AdminMealChart from "./AdminMealChart";
+import { Helmet } from "react-helmet-async";
 
 const AdminProfile = () => {
   const axiosSecure = useAxiosSecure();
@@ -23,6 +24,11 @@ const AdminProfile = () => {
     <div
       className={`p-6 min-h-screen ${isDark ? "text-white" : "text-gray-800"}`}
     >
+     
+     <Helmet>
+      <title>Admin Profile - HostelBite</title>
+     </Helmet>
+
       <div className="max-w-xl mx-auto bg-base-200 rounded-xl shadow p-6 flex flex-col items-center text-center">
         <img
           src={admin.image}

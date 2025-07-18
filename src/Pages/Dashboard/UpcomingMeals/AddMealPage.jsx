@@ -4,6 +4,7 @@ import useAuth from "../../../Hooks/useAuth";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { Helmet } from "react-helmet-async";
 
 const imageHostingKey = import.meta.env.VITE_IMAGEBB_KEY;
 const imageUploadUrl = `https://api.imgbb.com/1/upload?key=${imageHostingKey}`;
@@ -81,6 +82,10 @@ const AddMealPage = () => {
 
   return (
     <div className="min-h-screen flex items-center ">
+      <Helmet>
+        <title>HostelBite | Add Upcoming Meal</title>
+      </Helmet>
+
       <div className="max-w-3xl mx-auto p-8 rounded-lg shadow-lg bg-gradient-to-r from-blue-50 via-white to-pink-50 text-gray-800">
         <h2 className="text-3xl font-bold mb-6 text-center">
           Add Upcoming Meal
@@ -232,7 +237,7 @@ const AddMealPage = () => {
                   {...register("likes", {
                     valueAsNumber: true,
                     min: 0,
-                    required: false, 
+                    required: false,
                   })}
                   type="number"
                   placeholder="Enter likes count (default 0)"

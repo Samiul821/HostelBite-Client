@@ -6,6 +6,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import CheckoutForm from "./CheckoutForm";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
 import { useTheme } from "../../Hooks/useTheme";
+import { Helmet } from "react-helmet-async";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
@@ -52,6 +53,10 @@ const Checkout = () => {
         isDark ? "bg-gray-900 text-gray-100" : "bg-white text-gray-900"
       }`}
     >
+      <Helmet>
+        <title>HostelBite | Checkout</title>
+      </Helmet>
+
       <h1 className="text-3xl font-bold mb-4 text-center">
         {packageData.name} Package
       </h1>

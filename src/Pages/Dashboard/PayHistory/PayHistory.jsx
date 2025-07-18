@@ -3,6 +3,7 @@ import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import useAuth from "../../../Hooks/useAuth";
 import { useTheme } from "../../../Hooks/useTheme";
 import { useQuery } from "@tanstack/react-query";
+import { Helmet } from "react-helmet-async";
 
 const PayHistory = () => {
   const axiosSecure = useAxiosSecure();
@@ -28,6 +29,10 @@ const PayHistory = () => {
     <div
       className={`p-4 min-h-screen ${isDark ? "text-white" : "text-gray-800 "}`}
     >
+      <Helmet>
+        <title>HostelBite | Payment History</title>
+      </Helmet>
+
       <h2 className="text-3xl font-bold mb-6 text-center">Payment History</h2>
 
       {isLoading && (

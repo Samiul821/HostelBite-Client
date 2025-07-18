@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTheme } from "../../../Hooks/useTheme";
+import { Helmet } from "react-helmet-async";
 
 const Forbidden = () => {
   const { isDark } = useTheme();
@@ -11,6 +12,10 @@ const Forbidden = () => {
         isDark ? " text-white" : " text-gray-800"
       }`}
     >
+      <Helmet>
+        <title>HostelBite | Forbidden</title>
+      </Helmet>
+
       <motion.img
         src="https://i.ibb.co/YT4Hn3kZ/download-22.jpg"
         alt="403 Forbidden"

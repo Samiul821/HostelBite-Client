@@ -7,6 +7,7 @@ import Modal from "react-modal";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Helmet } from "react-helmet-async";
 
 const imageHostingKey = import.meta.env.VITE_IMAGEBB_KEY;
 const imageUploadUrl = `https://api.imgbb.com/1/upload?key=${imageHostingKey}`;
@@ -98,6 +99,10 @@ const MyProfile = () => {
         isDark ? "bg-gray-900 text-white" : "bg-white text-gray-800"
       }`}
     >
+      <Helmet>
+        <title>HostelBite | My Profile</title>
+      </Helmet>
+
       <h2 className="text-3xl font-bold mb-6 text-center">My Profile</h2>
 
       <div className="flex flex-col items-center space-y-4">

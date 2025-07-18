@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import MealModal from "./MealModal";
 import EditReviewModal from "./EditReviewModal";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Helmet } from "react-helmet-async";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -115,6 +116,10 @@ const MyReviews = () => {
     <div
       className={`p-4 min-h-screen ${isDark ? " text-white" : "text-gray-800"}`}
     >
+      <Helmet>
+        <title>HostelBite | My Reviews</title>
+      </Helmet>
+
       <h2 className="text-3xl font-bold mb-6 text-center">My Reviews</h2>
 
       <div className="overflow-x-auto shadow-md rounded-lg">
