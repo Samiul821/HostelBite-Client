@@ -46,8 +46,3 @@
 - 🔄 Fully Responsive UI (Mobile First)
 - 🔒 Private and Admin Routes
 - ✅ Real-time Feedback using Toasts & Modals
-
----
-
-## 📁 Folder Structure
-
