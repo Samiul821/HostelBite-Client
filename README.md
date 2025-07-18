@@ -1,12 +1,53 @@
-# React + Vite
+# 🍽️ HostelBite — Client Side
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**HostelBite** is a modern and user-friendly meal booking web application tailored for hostel students and admins. This is the **client-side** of the full-stack project, built with React, Tailwind CSS, React Router, and integrated with a secure backend.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Live Website
 
-## Expanding the ESLint configuration
+🌐 [Live Demo Link](https://hostelbite-8a374.web.app/)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 🛠 Tech Stack
+
+- **React.js**
+- **React Router DOM**
+- **Axios**
+- **@tanstack/react-query**
+- **Tailwind CSS**
+- **Framer Motion**
+- **Firebase Authentication**
+- **DaisyUI**
+- **React Icons**
+
+---
+
+## 🔐 Authentication
+
+- Firebase Email/Password Auth
+- Google OAuth
+- Token-based route protection
+- Role-based access control (user/admin)
+
+---
+
+## 🔑 Features
+
+- 🔐 Secure Login & Registration
+- 🧑 User Dashboard with Meal Booking
+- 📦 Admin Dashboard to manage meals, bookings, and users
+- ⭐ Featured Meals Section
+- 🔍 Search and Filter Meals
+- 📆 Book Meals by Date
+- ❤️ Like & Favorite Meals
+- 🌙 Dark/Light Mode Toggle
+- 🔄 Fully Responsive UI (Mobile First)
+- 🔒 Private and Admin Routes
+- ✅ Real-time Feedback using Toasts & Modals
+
+---
+
+## 📁 Folder Structure
+
