@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 
 const Banner = () => {
   return (
-    <section className="relative rounded-xl w-full h-[65vh] md:h-[70vh] overflow-hidden">
+    <section className="relative mt-16 rounded-xl w-full h-[65vh] md:h-[70vh] overflow-hidden">
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center"

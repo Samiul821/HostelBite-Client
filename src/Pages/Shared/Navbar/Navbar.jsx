@@ -120,25 +120,12 @@ const Navbar = () => {
                   Dashboard
                 </button>
 
-                <button
+                <NavLink
+                  to="/profile"
                   className="block w-full text-left px-6 py-3 hover:bg-indigo-600 hover:text-white"
-                  onClick={() => {
-                    setDropdownOpen(false);
-                    navigate("/profile");
-                  }}
                 >
                   Profile
-                </button>
-
-                <button
-                  className="block w-full text-left px-6 py-3 hover:bg-indigo-600 hover:text-white"
-                  onClick={() => {
-                    setDropdownOpen(false);
-                    navigate("/orders");
-                  }}
-                >
-                  My Orders
-                </button>
+                </NavLink>
 
                 <button
                   className="block w-full text-left px-6 py-3 hover:bg-indigo-600 hover:text-white"

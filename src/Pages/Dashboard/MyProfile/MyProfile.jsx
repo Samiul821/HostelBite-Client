@@ -53,6 +53,7 @@ const MyProfile = () => {
     try {
       let imageUrl = profile?.profileImage;
 
+      // যদি নতুন ছবি আপলোড করে
       if (data.image?.[0]) {
         const formData = new FormData();
         formData.append("image", data.image[0]);
@@ -60,10 +61,13 @@ const MyProfile = () => {
         imageUrl = imgRes?.data?.data?.url;
       }
 
-      // Firebase update
-      await updateUser(data.name, imageUrl);
+      // 🔥 Firebase update
+      await updateUser({
+        displayName: data.name,
+        photoURL: imageUrl,
+      });
 
-      // MongoDB update
+      // 🔥 MongoDB update
       const res = await axiosSecure.patch("/user/update", {
         email: user.email,
         name: data.name,
