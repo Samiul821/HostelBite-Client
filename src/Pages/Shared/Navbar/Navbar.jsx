@@ -44,7 +44,7 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`sticky top-0 z-30 shadow-md px-[3%] lg:px-[10%] py-4 flex items-center justify-between ${colors.background} ${colors.text}`}
+      className={`fixed top-0 left-0 w-full z-30 shadow-md px-[3%] lg:px-[10%] py-4 flex items-center justify-between ${colors.background} ${colors.text}`}
     >
       {/* Logo */}
       <NavLink to="/" className="text-2xl font-extrabold">
@@ -109,6 +109,7 @@ const Navbar = () => {
                 <div className="px-6 py-4 border-b border-gray-300 font-semibold">
                   {user.displayName || "User"}
                 </div>
+
                 <button
                   className="block w-full text-left px-6 py-3 hover:bg-indigo-600 hover:text-white"
                   onClick={() => {
@@ -118,6 +119,27 @@ const Navbar = () => {
                 >
                   Dashboard
                 </button>
+
+                <button
+                  className="block w-full text-left px-6 py-3 hover:bg-indigo-600 hover:text-white"
+                  onClick={() => {
+                    setDropdownOpen(false);
+                    navigate("/profile");
+                  }}
+                >
+                  Profile
+                </button>
+
+                <button
+                  className="block w-full text-left px-6 py-3 hover:bg-indigo-600 hover:text-white"
+                  onClick={() => {
+                    setDropdownOpen(false);
+                    navigate("/orders");
+                  }}
+                >
+                  My Orders
+                </button>
+
                 <button
                   className="block w-full text-left px-6 py-3 hover:bg-indigo-600 hover:text-white"
                   onClick={onLogout}
