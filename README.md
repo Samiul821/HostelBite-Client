@@ -10,6 +10,15 @@
 
 ---
 
+## 👨‍💼 Admin Credentials  
+
+Use the following credentials to log in as **Admin**:  
+
+- **Admin Email:** `smsamiul821@gmail.com`  
+- **Admin Password:** `Samiul@#890`  
+
+---
+
 ## 🛠 Tech Stack
 
 - **React.js**
@@ -26,23 +35,23 @@
 
 ## 🔐 Authentication
 
-- Firebase Email/Password Auth
-- Google OAuth
-- Token-based route protection
-- Role-based access control (user/admin)
+- Firebase Email/Password Auth  
+- Google OAuth  
+- Token-based route protection  
+- Role-based access control (user/admin)  
 
 ---
 
 ## 🔑 Features
 
-- 🔐 Secure Login & Registration
-- 🧑 User Dashboard with Meal Booking
-- 📦 Admin Dashboard to manage meals, bookings, and users
-- ⭐ Featured Meals Section
-- 🔍 Search and Filter Meals
-- 📆 Book Meals by Date
-- ❤️ Like & Favorite Meals
-- 🌙 Dark/Light Mode Toggle
-- 🔄 Fully Responsive UI (Mobile First)
-- 🔒 Private and Admin Routes
-- ✅ Real-time Feedback using Toasts & Modals
+- 🔐 Secure Login & Registration  
+- 🧑 User Dashboard with Meal Booking  
+- 📦 Admin Dashboard to manage meals, bookings, and users  
+- ⭐ Featured Meals Section  
+- 🔍 Search and Filter Meals  
+- 📆 Book Meals by Date  
+- ❤️ Like & Favorite Meals  
+- 🌙 Dark/Light Mode Toggle  
+- 🔄 Fully Responsive UI (Mobile First)  
+- 🔒 Private and Admin Routes  
+- ✅ Real-time Feedback using Toasts & Modals  
